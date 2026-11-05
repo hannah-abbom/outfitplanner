@@ -1,0 +1,1256 @@
+<title>Trip Wardrobe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column app shell. Each trip day is a boarding pass (stub | perforation | plans + outfits); wardrobe pieces are hang tags; packing is a checklist beside "missing / wear again / leave at home". */
+:root {
+  --paper: #f5f3f6;
+  --surface: #ffffff;
+  --sunk: #ebe7ed;
+  --ink: #1d1a22;
+  --muted: #6b6371;
+  --line: #ddd6df;
+  --accent: #7b1e3f;      /* passport burgundy */
+  --accent-ink: #ffffff;
+  --accent-soft: #f4e4ea;
+  --brass: #94680f;
+  --brass-soft: #f5ecd7;
+  --sun: #c97a0e;
+  --rain: #2b6cb0;
+  --cool: #3a8597;
+  --bad: #b3261e;
+  --bad-soft: #fbe8e6;
+  --good: #2e7d4f;
+  --good-soft: #e2f1e7;
+  --shadow: 0 1px 2px rgb(29 26 34 / .06), 0 6px 20px rgb(29 26 34 / .06);
+  --f-display: "Gloock", Georgia, "Times New Roman", serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141117; --surface: #1d1922; --sunk: #28232e; --ink: #f1edf3; --muted: #a79fad; --line: #363040;
+    --accent: #e98fac; --accent-ink: #2a0d18; --accent-soft: #3a2230; --brass: #dcb460; --brass-soft: #362d1b;
+    --sun: #f2a843; --rain: #80b6ee; --cool: #7cc4d4; --bad: #ff8f85; --bad-soft: #3d2221; --good: #7fd09f; --good-soft: #1d3326;
+    --shadow: 0 1px 2px rgb(0 0 0 / .5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141117; --surface: #1d1922; --sunk: #28232e; --ink: #f1edf3; --muted: #a79fad; --line: #363040;
+  --accent: #e98fac; --accent-ink: #2a0d18; --accent-soft: #3a2230; --brass: #dcb460; --brass-soft: #362d1b;
+  --sun: #f2a843; --rain: #80b6ee; --cool: #7cc4d4; --bad: #ff8f85; --bad-soft: #3d2221; --good: #7fd09f; --good-soft: #1d3326;
+  --shadow: 0 1px 2px rgb(0 0 0 / .5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.shell { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px 72px; display: flex; flex-direction: column; gap: 22px; }
+
+/* Top bar */
+.topbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-block: 8px 12px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; margin-right: auto; font-family: var(--f-mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.brand svg { color: var(--accent); }
+.tripselect { max-width: 230px; min-height: 36px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 14px; font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 7px 11px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 7px 15px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; text-decoration: none; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); border-color: var(--line); }
+.btn.small { min-height: 30px; padding: 4px 11px; font-size: 13px; }
+.btn.danger { color: var(--bad); }
+.btn[data-armed] { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn svg { flex: none; }
+
+/* Trip header */
+.triphead { display: grid; gap: 12px; }
+.eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunk); color: var(--muted); font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.tag.brass { background: var(--brass-soft); color: var(--brass); }
+.tag.bad { background: var(--bad-soft); color: var(--bad); }
+.tag.good { background: var(--good-soft); color: var(--good); }
+.tag.accent { background: var(--accent-soft); color: var(--accent); }
+.titlerow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+h1 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5.2vw, 50px); line-height: 1.04; letter-spacing: -.01em; text-wrap: balance; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; color: var(--muted); font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 0; border-block: 1px solid var(--line); }
+.stat { display: flex; align-items: baseline; gap: 6px; padding: 10px 18px 10px 0; margin-right: 18px; font-size: 13px; color: var(--muted); }
+.stat b { font-family: var(--f-mono); font-size: 18px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat.warn b { color: var(--bad); }
+
+.banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 16px; border-radius: var(--r); background: var(--brass-soft); font-size: 14px; }
+.banner p { margin: 0; flex: 1 1 280px; min-width: 0; }
+.banner .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Tabs */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tabs a { padding: 10px 14px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--muted); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
+.tabs .n { margin-left: 5px; font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--muted); }
+
+.view { display: flex; flex-direction: column; gap: 16px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.toolbar .note { margin-left: auto; font-size: 13px; color: var(--muted); }
+.job { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 14px; border-radius: var(--r); background: var(--accent-soft); font-size: 14px; }
+.job .txt { flex: 1; min-width: 0; }
+.job .txt small { display: block; color: var(--muted); font-size: 12.5px; }
+.spinner { width: 16px; height: 16px; flex: none; border: 2px solid var(--accent); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+
+/* Day cards: boarding passes */
+.days { display: flex; flex-direction: column; gap: 14px; }
+.day { display: grid; grid-template-columns: minmax(196px, 236px) minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.stub { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-right: 2px dashed var(--line); }
+.stub::before, .stub::after { content: ""; position: absolute; right: -9px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); border: 1px solid var(--line); }
+.stub::before { top: -9px; }
+.stub::after { bottom: -9px; }
+.daynum { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.date { font-family: var(--f-display); font-size: 27px; line-height: 1.05; }
+.loc { font-family: var(--f-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); overflow-wrap: anywhere; }
+.loc.empty { color: var(--muted); font-weight: 400; }
+.wx { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 10px; margin-top: 6px; }
+.wx svg { width: 30px; height: 30px; grid-row: span 2; }
+.temps { font-family: var(--f-mono); font-size: 17px; font-variant-numeric: tabular-nums; }
+.temps .lo { color: var(--muted); }
+.rainp { font-family: var(--f-mono); font-size: 12px; color: var(--rain); }
+.wxsum { margin: 2px 0 0; font-size: 13px; line-height: 1.35; color: var(--muted); }
+.sky-sun { color: var(--sun); } .sky-partly { color: var(--sun); } .sky-cloud { color: var(--muted); }
+.sky-rain, .sky-storm { color: var(--rain); } .sky-snow, .sky-wind { color: var(--cool); }
+.stub .tag { align-self: flex-start; margin-top: 4px; }
+
+.daybody { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 18px; }
+.plans { display: flex; flex-direction: column; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.plans li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; font-size: 14px; }
+.plans .t { padding-top: 2px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.outfits { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 10px; }
+.outfit { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); min-width: 0; }
+.ohead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.slot { font-family: var(--f-mono); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--brass); }
+.olabel { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.oitems { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.oitems li { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 13.5px; line-height: 1.25; }
+.oitems li > span:nth-child(2) { flex: 1; min-width: 0; }
+.rep { font-family: var(--f-mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.thumb { position: relative; flex: none; width: 34px; height: 34px; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--sw, var(--sunk)); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+img.broken { visibility: hidden; }
+.need { padding: 4px 9px; border-radius: 8px; background: var(--bad-soft); color: var(--bad); font-size: 12.5px; font-weight: 600; }
+.onote { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+.x { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--muted); cursor: pointer; }
+.x:hover { color: var(--bad); border-color: var(--bad); }
+.oedit { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.oedit select, .oedit input { width: 100%; min-height: 34px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; }
+.oedit .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dayacts { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Wardrobe: hang tags */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 13px; cursor: pointer; }
+.chip .n { margin-left: 4px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.item { position: relative; display: flex; flex-direction: column; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); text-align: left; cursor: pointer; }
+.item:hover { border-color: var(--muted); }
+.item .ph { position: relative; aspect-ratio: 1 / 1; width: 100%; max-width: 100%; background: var(--sw, var(--sunk)); }
+.item .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.item .ph .cat { position: absolute; left: 10px; bottom: 8px; padding: 2px 7px; border-radius: 999px; background: rgb(255 255 255 / .82); color: #2a2530; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+.item .hole { position: absolute; top: 10px; right: 10px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 1px solid var(--line); }
+.item .meta { display: flex; flex-direction: column; gap: 5px; padding: 10px 11px 12px; }
+.item .nm { font-weight: 600; font-size: 14px; line-height: 1.25; }
+.item .sub { font-size: 12px; color: var(--muted); }
+.item .badges { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* Packing */
+.pack { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; gap: 28px; }
+.col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.progress .bar { height: 8px; overflow: hidden; border-radius: 99px; background: var(--sunk); }
+.progress .bar i { display: block; height: 100%; background: var(--good); transition: width .3s; }
+.progress .lbl { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted); }
+.progress .lbl b { font-family: var(--f-mono); font-weight: 500; color: var(--ink); }
+h2.sec, h3.sec { margin: 0 0 8px; font-family: var(--f-mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h2.big { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 24px; }
+.checks { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.checks li { border-bottom: 1px solid var(--line); }
+.checks label { display: flex; align-items: center; gap: 10px; padding: 8px 2px; cursor: pointer; }
+.checks input { width: 19px; height: 19px; flex: none; accent-color: var(--good); }
+.checks .nm { flex: 1; min-width: 0; }
+.checks .done .nm { color: var(--muted); text-decoration: line-through; }
+.checks .why { display: block; font-size: 12px; color: var(--muted); text-decoration: none; }
+.qty { font-family: var(--f-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.panel { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.panel.alert { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+.panel h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 21px; }
+.panel .lead { margin: -4px 0 0; font-size: 13px; color: var(--muted); }
+.rows { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.rows li { display: flex; align-items: flex-start; gap: 10px; min-width: 0; font-size: 14px; }
+.rows li > div { flex: 1; min-width: 0; }
+.rows .why { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.tips { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+
+/* Empty + notices */
+.empty { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 26px 22px; border: 1.5px dashed var(--line); border-radius: var(--r); color: var(--muted); }
+.empty h3 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 23px; color: var(--ink); }
+.empty p { margin: 0; max-width: 60ch; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; margin: 6px 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; padding: 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); font-size: 14px; }
+.steps li::before { content: "0" counter(s); display: block; margin-bottom: 4px; font-family: var(--f-mono); font-size: 12px; color: var(--accent); letter-spacing: .1em; }
+.steps b { display: block; }
+.steps span { color: var(--muted); font-size: 13px; }
+.skeleton { height: 120px; border-radius: var(--r); background: var(--sunk); }
+
+/* Dialog */
+dialog { width: min(580px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 70px rgb(0 0 0 / .28); }
+dialog::backdrop { background: rgb(20 17 23 / .5); }
+dialog form { display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+dialog h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 27px; line-height: 1.1; }
+dialog .lead { margin: -6px 0 0; color: var(--muted); font-size: 14px; }
+.field { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--ink); font-size: 16px; font-weight: 400; }
+.field input[type="color"] { padding: 2px; height: 42px; }
+.field textarea { min-height: 120px; resize: vertical; line-height: 1.45; }
+.field.check { flex-direction: row; align-items: center; gap: 10px; color: var(--ink); font-weight: 500; font-size: 15px; }
+.field.check input { width: 19px; height: 19px; accent-color: var(--accent); }
+.hint { font-size: 12.5px; font-weight: 400; color: var(--muted); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+.actions .left { margin-right: auto; }
+.photoedit { display: flex; align-items: center; gap: 14px; }
+.photoedit .thumb { width: 84px; height: 84px; border-radius: 12px; }
+.err { margin: 0; padding: 8px 12px; border-radius: 9px; background: var(--bad-soft); color: var(--bad); font-size: 14px; }
+
+#toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 60; max-width: calc(100vw - 32px); padding: 10px 18px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; box-shadow: var(--shadow); transform: translateX(-50%); }
+#toast.bad { background: var(--bad); color: #fff; }
+
+@media (max-width: 820px) {
+  .pack { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .day { grid-template-columns: 1fr; }
+  .stub { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; border-right: 0; border-bottom: 2px dashed var(--line); }
+  .stub > * { grid-column: 1; }
+  .stub .wxcol { grid-column: 2; grid-row: 1 / span 4; align-self: start; max-width: 150px; }
+  .stub::before, .stub::after { top: auto; bottom: -9px; }
+  .stub::before { left: -9px; right: auto; }
+  .stub::after { right: -9px; }
+  .outfits { grid-template-columns: 1fr; }
+  .row3 { grid-template-columns: 1fr 1fr; }
+  .stat { padding-right: 12px; margin-right: 12px; }
+}
+@media (max-width: 420px) {
+  .row2 { grid-template-columns: 1fr; }
+  .tripselect { max-width: 100%; flex: 1 1 100%; order: 3; }
+}
+</style>
+
+<div id="app"></div>
+<input type="file" id="photoIn" class="vh" accept="image/*" multiple tabindex="-1" aria-hidden="true">
+<dialog id="dlg" aria-labelledby="dlgTitle"></dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- constants ---------- */
+const CATS = [
+  ['top', 'Tops'], ['bottom', 'Bottoms'], ['dress', 'Dresses & sets'], ['layer', 'Layers'], ['shoes', 'Shoes'],
+  ['swim', 'Swim'], ['active', 'Active'], ['sleep', 'Sleep & lounge'], ['accessory', 'Accessories'], ['bag', 'Bags'], ['other', 'Other']
+];
+const CAT_KEYS = CATS.map(c => c[0]);
+const CAT_LABEL = Object.fromEntries(CATS);
+const CAT_ONE = { top: 'Top', bottom: 'Bottom', dress: 'Dress', layer: 'Layer', shoes: 'Shoes', swim: 'Swim', active: 'Active', sleep: 'Sleep', accessory: 'Accessory', bag: 'Bag', other: 'Other' };
+const KINDS = [['honeymoon', 'Honeymoon'], ['beach', 'Beach'], ['city', 'City break'], ['cruise', 'Cruise'], ['adventure', 'Outdoors & adventure'], ['ski', 'Ski & snow'], ['wedding', 'Wedding guest'], ['business', 'Work trip'], ['other', 'Other']];
+const KIND_LABEL = Object.fromEntries(KINDS);
+const SLOTS = [['travel', 'Travel'], ['day', 'Day'], ['activity', 'Activity'], ['evening', 'Evening']];
+const SLOT_LABEL = Object.fromEntries(SLOTS);
+const SLOT_ORDER = { travel: 0, day: 1, activity: 2, evening: 3 };
+const SKIES = [['sun', 'Sunny'], ['partly', 'Partly cloudy'], ['cloud', 'Cloudy'], ['rain', 'Rain'], ['storm', 'Thunderstorms'], ['snow', 'Snow'], ['wind', 'Windy']];
+const WARMTH = { light: 'Hot weather', mid: 'Mild weather', warm: 'Cold weather' };
+const FORMALITY = { casual: 'Casual', smart: 'Smart', dressy: 'Dressy' };
+const STATUS = { own: 'Have it', ordered: 'On the way', 'to-buy': 'Need to buy' };
+const SRC = { typical: 'Typical', forecast: 'Forecast', manual: 'Your entry' };
+const SRC_TITLE = {
+  typical: 'Typical weather for this place and date, estimated by Claude from climate averages. Real forecasts are only reliable about 10 days ahead.',
+  forecast: 'From a weather forecast.',
+  manual: 'Weather you entered yourself.'
+};
+const VIEWS = ['days', 'wardrobe', 'packing'];
+
+const I = (d, s = 16, extra = '') => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
+const ICON = {
+  tag: I('<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>'),
+  plus: I('<path d="M12 5v14M5 12h14"/>'),
+  camera: I('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>'),
+  link: I('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'),
+  spark: I('<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>'),
+  doc: I('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>'),
+  copy: I('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+  x: I('<path d="M18 6L6 18M6 6l12 12"/>', 14),
+  edit: I('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>', 14)
+};
+const SKY_SVG = {
+  sun: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M2 12h2.2M19.8 12H22M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5"/>',
+  partly: '<path d="M8 2.5v1.6M2.5 8h1.6M4.1 4.1l1.1 1.1M11.9 4.1l-1.1 1.1"/><path d="M5.3 10.6A3.4 3.4 0 0 1 11 6.4"/><path d="M17.5 12h-1A6 6 0 1 0 10 20h7.5a4 4 0 0 0 0-8z"/>',
+  cloud: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  rain: '<path d="M16 13v8M8 13v8M12 15v8"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>',
+  storm: '<path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><path d="M13 11l-4 6h6l-4 6"/>',
+  snow: '<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><path d="M8 16h.01M8 20h.01M12 18h.01M12 22h.01M16 16h.01M16 20h.01"/>',
+  wind: '<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>'
+};
+
+/* ---------- state ---------- */
+const S = {
+  status: 'loading', db: null, sample: null, assets: null, user: null,
+  trips: [], wardrobe: [], tripsIn: false, wardIn: false, dbErr: null, slow: false,
+  tripId: lsGet('tw.trip'), view: viewFromHash(), unit: lsGet('tw.unit') || 'F',
+  filter: 'all', job: null, editOutfit: null, aiOff: false, imagesOk: false, canWrite: true, dlgPhoto: undefined, dlgNew: null
+};
+
+/* ---------- helpers ---------- */
+function lsGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const str = (v, n) => (typeof v === 'string' ? v : v == null ? '' : String(v)).trim().slice(0, n);
+const isISO = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+const D = s => new Date(s + 'T12:00:00');
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const today = () => iso(new Date());
+const addDays = (s, n) => { const d = D(s); d.setDate(d.getDate() + n); return iso(d); };
+const slug = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'item';
+const hexOk = h => typeof h === 'string' && /^#[0-9a-f]{6}$/i.test(h);
+const num = v => (v === '' || v == null || !isFinite(Number(v))) ? null : Number(v);
+function viewFromHash() { const h = location.hash.replace('#', ''); return VIEWS.includes(h) ? h : 'days'; }
+function dateList(a, b) { const out = []; if (!isISO(a) || !isISO(b) || b < a) return out; let d = a; while (d <= b && out.length < 61) { out.push(d); d = addDays(d, 1); } return out; }
+function fmtDay(s) { return D(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function fmtWeekday(s) { return D(s).toLocaleDateString('en-US', { weekday: 'short' }); }
+function fmtRange(a, b) {
+  if (!isISO(a)) return 'Dates not set';
+  if (!isISO(b) || a === b) return D(a).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const A = D(a), B = D(b), m = d => d.toLocaleDateString('en-US', { month: 'short' });
+  const sameY = A.getFullYear() === B.getFullYear();
+  if (sameY && A.getMonth() === B.getMonth()) return `${m(A)} ${A.getDate()}–${B.getDate()}, ${B.getFullYear()}`;
+  return `${m(A)} ${A.getDate()}${sameY ? '' : ', ' + A.getFullYear()} – ${m(B)} ${B.getDate()}, ${B.getFullYear()}`;
+}
+function temp(c) { if (c == null || !isFinite(c)) return '–'; return S.unit === 'F' ? Math.round(c * 9 / 5 + 32) : Math.round(c); }
+function toC(v) { const n = num(v); if (n == null) return null; return S.unit === 'F' ? Math.round((n - 32) * 5 / 9 * 10) / 10 : n; }
+function sortTrips(ts) { return [...ts].sort((a, b) => (a.example ? 1 : 0) - (b.example ? 1 : 0) || String(a.start || '9999').localeCompare(String(b.start || '9999')) || String(a.name).localeCompare(String(b.name))); }
+function curTrip() { return S.trips.find(t => t.id === S.tripId) || null; }
+function travelersOf(t) { return (t?.travelers?.length ? t.travelers : ['Me']); }
+function itemMap() { return new Map(S.wardrobe.map(i => [i.id, i])); }
+function wardrobeFor(trip) { const ex = !!trip?.example; return S.wardrobe.filter(i => !!i.example === ex); }
+function planItemsFor(trip) { const tv = travelersOf(trip); return wardrobeFor(trip).filter(i => !i.owner || tv.includes(i.owner) || tv.length === 1); }
+function photoUrl(id) { return id ? '/_blob/' + encodeURIComponent(id) : ''; }
+function thumb(item, cls = 'thumb') {
+  const sw = item && hexOk(item.colorHex) ? ` style="--sw:${item.colorHex}"` : '';
+  return `<span class="${cls}"${sw}>${item?.photo ? `<img src="${photoUrl(item.photo)}" alt="" loading="lazy">` : ''}</span>`;
+}
+function parsePlans(text) {
+  return String(text || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const m = l.match(/^(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)\s*[-–—·:]?\s+(.+)$/i);
+    return m && /\d/.test(m[1]) && (m[1].includes(':') || m[1].includes('.') || /am|pm/i.test(m[1])) ? { t: m[1], text: m[2] } : { t: '', text: l };
+  });
+}
+function filledLocations(days) { let last = ''; return days.map(d => { if (d.location) last = d.location; return d.location || last; }); }
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg, bad = false) {
+  const el = $('#toast'); el.textContent = msg; el.className = bad ? 'bad' : ''; el.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, bad ? 6500 : 3200);
+}
+
+/* ---------- writes (one at a time per document) ---------- */
+const queues = {};
+function write(path, fn) {
+  const p = (queues[path] || Promise.resolve()).then(fn).then(() => true, e => { toast(dbErr(e), true); return false; });
+  queues[path] = p;
+  return p;
+}
+function dbErr(e) {
+  const c = e?.code;
+  if (c === 'quota_exceeded') return 'Storage is full. Delete some trips or items, then try again.';
+  if (c === 'invalid_argument') { S.canWrite = false; return 'This page is read-only for you, so changes can’t be saved.'; }
+  if (c === 'resource_exhausted') return 'Too many changes at once. Wait a moment and try again.';
+  if (c === 'revoked') return 'Your access to this page changed. Reload to continue.';
+  return 'That change didn’t save. Check your connection and try again.';
+}
+const tripDoc = id => S.db.doc('trips/' + id);
+function updTrip(id, patch) { return write('trips/' + id, () => tripDoc(id).update({ ...patch, updatedAt: Date.now() })); }
+function setOutfits(trip, fn) {
+  const outfits = structuredClone(trip.plan?.outfits || []);
+  fn(outfits);
+  return updTrip(trip.id, { plan: { outfits } });
+}
+
+/* ---------- AI errors ---------- */
+function aiErr(e) {
+  const c = e?.code;
+  if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(c)) {
+    S.aiOff = true; return 'Claude isn’t available on this page for your account, so the Claude buttons are hidden. You can still add everything by hand.';
+  }
+  if (c === 'cancelled') return null;
+  if (c === 'images_unavailable') { S.imagesOk = false; return 'Photos can’t be sent to Claude from this view. Paste links or add items by hand instead.'; }
+  if (c === 'image_rejected') return 'That photo couldn’t be read. Try a JPEG or PNG screenshot under 20 MB.';
+  if (c === 'rate_limited') return 'Claude is getting too many requests. Wait a minute and try again.';
+  if (c === 'invalid_json') return 'Claude’s answer came back in the wrong shape. Try again.';
+  if (c === 'refused') return 'Claude declined that request. Try rewording it.';
+  if (c === 'prompt_too_large') return 'That’s too much at once. Try a shorter piece.';
+  if (c === 'session_expired') return 'Your Claude session expired. Sign in again.';
+  if (c === 'empty_completion') return 'Claude didn’t return anything. Try again with less at once.';
+  if (e?.message === 'decode') return 'That photo format couldn’t be opened. Try a JPEG or PNG.';
+  return 'Something went wrong reaching Claude. Try again.';
+}
+const aiReady = () => !!S.sample && !S.aiOff;
+
+async function runJob(label, detail, fn) {
+  if (S.job) { toast('Claude is still working on the last request.'); return; }
+  const ctl = new AbortController();
+  S.job = { label, detail, ctl, progress: '' };
+  render();
+  try { await fn(ctl.signal, p => { if (S.job) { S.job.progress = p; const el = $('#jobProgress'); if (el) el.textContent = p; } }); }
+  catch (e) { const m = aiErr(e); if (m) toast(m, true); }
+  finally { S.job = null; render(); }
+}
+
+/* ---------- boot ---------- */
+async function boot() {
+  render();
+  if (!window.claude?.use) { S.status = 'noruntime'; render(); return; }
+  const slowT = setTimeout(() => { if (!S.tripsIn) { S.slow = true; render(); } }, 10000);
+  const [db, sample, assets, user] = await Promise.all(['db', 'sample', 'assets', 'user'].map(n => Promise.resolve(window.claude.use(n)).catch(() => null)));
+  Object.assign(S, { db, sample, assets, user });
+  if (sample) { try { const lim = await sample.limits(); S.imagesOk = !!lim?.images; } catch { S.imagesOk = false; } }
+  if (user) { try { const w = await user.can('data.write'); S.canWrite = w !== false; } catch {} }
+  if (!db) { clearTimeout(slowT); S.status = 'nodb'; render(); return; }
+  S.status = 'ready';
+  db.collection('trips').onSnapshot(snap => {
+    S.trips = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    S.tripsIn = true;
+    if (!snap.metadata.fromCache) { clearTimeout(slowT); S.slow = false; }
+    pickTrip(); render();
+  }, err => { clearTimeout(slowT); S.dbErr = err; render(); });
+  db.collection('wardrobe').onSnapshot(snap => {
+    S.wardrobe = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    S.wardIn = true; render();
+  }, err => { S.dbErr = err; render(); });
+}
+function pickTrip() {
+  if (S.trips.some(t => t.id === S.tripId)) return;
+  const sorted = sortTrips(S.trips), real = sorted.filter(t => !t.example), t0 = today();
+  const upcoming = real.filter(t => !t.end || t.end >= t0);
+  S.tripId = (upcoming[0] || real[real.length - 1] || sorted[0])?.id || null;
+}
+
+/* ---------- render ---------- */
+function render() {
+  const app = $('#app');
+  const y = window.scrollY;
+  app.innerHTML = `<div class="shell">${topbar()}${main()}</div>`;
+  if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+}
+function topbar() {
+  const sorted = sortTrips(S.trips);
+  return `<header class="topbar">
+    <div class="brand">${ICON.tag}<span>Trip Wardrobe</span></div>
+    ${sorted.length ? `<select class="tripselect" id="tripSel" aria-label="Choose a trip">${sorted.map(t => `<option value="${esc(t.id)}"${t.id === S.tripId ? ' selected' : ''}>${esc(t.name || 'Untitled trip')}${t.example ? ' (example)' : ''}</option>`).join('')}</select>` : ''}
+    ${S.db && S.canWrite && S.tripsIn ? `<button class="btn small" data-act="newTrip">${ICON.plus}New trip</button>` : ''}
+    <div class="seg" role="group" aria-label="Temperature unit">
+      <button data-act="unit" data-u="F" aria-pressed="${S.unit === 'F'}">°F</button><button data-act="unit" data-u="C" aria-pressed="${S.unit === 'C'}">°C</button>
+    </div>
+  </header>`;
+}
+function notice(title, text) { return `<div class="empty"><h3>${esc(title)}</h3><p>${esc(text)}</p></div>`; }
+function main() {
+  if (S.status === 'noruntime') return notice('Open this page in Claude', 'Trip Wardrobe saves your trips and clothes to your Claude account, so it works when opened from claude.ai or the Claude app.');
+  if (S.status === 'nodb') return notice('Sign in to see your trips', 'Your trips and wardrobe are saved with your Claude account. Sign in to claude.ai, then open this page again.');
+  if (S.dbErr) return notice('Your trips can’t be loaded right now', 'The connection to your saved trips stopped. Reload the page to reconnect.');
+  if (!S.tripsIn) return `${S.slow ? `<p class="muted">Still connecting to your saved trips. If this keeps up, check your connection.</p>` : ''}<div class="skeleton"></div><div class="skeleton"></div>`;
+  const trip = curTrip();
+  if (!trip) return welcome();
+  return tripHead(trip) + tabs(trip) + jobBar() + `<section class="view">${S.view === 'wardrobe' ? wardView(trip) : S.view === 'packing' ? packView(trip) : daysView(trip)}</section>`;
+}
+function welcome() {
+  return `<div class="empty">
+    <h3>Plan what to wear for every day of your trip</h3>
+    <p>Add your itinerary and Claude works out the typical weather for each day. Snap photos of your clothes or paste links to what you bought, then get an outfit plan, a packing checklist, and a list of what you’re missing.</p>
+    <ol class="steps">
+      <li><b>Add your trip</b><span>Dates, places, and what you’re doing each day. Paste the itinerary as it is.</span></li>
+      <li><b>Add your clothes</b><span>Photos, product links, or by hand. They stay in your wardrobe for future trips.</span></li>
+      <li><b>Plan outfits</b><span>Outfits per day, what to repeat, what to leave home, and what to buy.</span></li>
+    </ol>
+    ${S.canWrite ? `<button class="btn primary" data-act="newTrip">${ICON.plus}Create your first trip</button>` : ''}
+  </div>`;
+}
+function tripHead(t) {
+  const days = t.days || [];
+  const places = [...new Set(days.map(d => (d.location || '').trim()).filter(Boolean))];
+  const pk = packingFor(t);
+  const missing = (t.plan?.missing || []).filter(m => !m.added).length;
+  const tv = travelersOf(t);
+  const nights = Math.max(0, days.length - 1);
+  return `<section class="triphead">
+    ${t.example ? `<div class="banner"><p><b>This is an example trip</b> so you can see how the planner works. Your own trips and clothes are kept separate from it.</p><div class="acts">${S.canWrite ? `<button class="btn small primary" data-act="newTrip">Start my trip</button><button class="btn small" data-act="removeExample" data-confirm="Tap again to remove">Remove example</button>` : ''}</div></div>` : ''}
+    <div class="eyebrow"><span>${esc(KIND_LABEL[t.kind] || 'Trip')}</span><span>${esc(fmtRange(t.start, t.end))}</span>${days.length ? `<span>${nights} night${nights === 1 ? '' : 's'}</span>` : ''}</div>
+    <div class="titlerow">
+      <h1>${esc(t.name || 'Untitled trip')}</h1>
+      ${S.canWrite ? `<button class="btn small" data-act="editTrip">${ICON.edit}Edit trip</button>` : ''}
+    </div>
+    <div class="facts">
+      <span>Packing for ${esc(tv.join(' & '))}</span>
+      <span>${t.luggage === 'carry-on' ? 'Carry-on only' : 'Checked bag'}</span>
+      <span>${t.laundry ? 'Laundry available' : 'No laundry'}</span>
+      ${places.length ? `<span>${esc(places.join(' → '))}</span>` : ''}
+    </div>
+    <div class="stats">
+      <div class="stat"><b>${days.length}</b>days</div>
+      <div class="stat"><b>${places.length}</b>place${places.length === 1 ? '' : 's'}</div>
+      <div class="stat"><b>${t.plan?.outfits?.length || 0}</b>outfits</div>
+      <div class="stat"><b>${pk.clothes.length}</b>pieces to pack</div>
+      <div class="stat${missing ? ' warn' : ''}"><b>${missing}</b>missing</div>
+    </div>
+  </section>`;
+}
+function tabs(t) {
+  const pk = packingFor(t);
+  const n = { days: (t.days || []).length, wardrobe: wardrobeFor(t).length, packing: pk.total ? `${pk.done}/${pk.total}` : '' };
+  const lab = { days: 'Days & outfits', wardrobe: 'Wardrobe', packing: 'Packing list' };
+  return `<nav class="tabs" aria-label="Sections">${VIEWS.map(v => `<a href="#${v}"${S.view === v ? ' aria-current="page"' : ''}>${lab[v]}${n[v] !== '' ? `<span class="n">${esc(n[v])}</span>` : ''}</a>`).join('')}</nav>`;
+}
+function jobBar() {
+  if (!S.job) return '';
+  return `<div class="job" role="status"><span class="spinner" aria-hidden="true"></span><div class="txt"><b>${esc(S.job.label)}</b><small id="jobProgress">${esc(S.job.progress || S.job.detail || 'Thinking…')}</small></div><button class="btn small" data-act="stopJob">Stop</button></div>`;
+}
+
+/* ---------- days view ---------- */
+function daysView(t) {
+  const days = t.days || [];
+  const ai = aiReady() && S.canWrite;
+  const planned = !!t.plan?.outfits?.length;
+  const bar = S.canWrite ? `<div class="toolbar">
+      ${ai ? `<button class="btn" data-act="itinerary">${ICON.doc}Paste itinerary</button>` : ''}
+      ${ai && days.length ? `<button class="btn" data-act="weather">${ICON.spark}${days.some(d => d.weather) ? 'Refresh weather' : 'Estimate weather'}</button>` : ''}
+      ${ai && days.length ? `<button class="btn primary" data-act="plan" ${planned ? 'data-confirm="Tap again to replace outfits"' : ''}>${ICON.spark}${planned ? 'Re-plan outfits' : 'Plan outfits'}</button>` : ''}
+      ${t.plan?.generatedAt ? `<span class="note">Outfits planned ${esc(new Date(t.plan.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))}</span>` : ''}
+    </div>` : '';
+  if (!days.length) {
+    return bar + `<div class="empty"><h3>No days yet</h3><p>Set your trip dates, or paste your itinerary and Claude will lay out the days, places and plans for you.</p>${S.canWrite ? `<div class="toolbar"><button class="btn" data-act="editTrip">Set dates</button>${aiReady() ? `<button class="btn primary" data-act="itinerary">${ICON.doc}Paste itinerary</button>` : ''}</div>` : ''}</div>`;
+  }
+  const items = itemMap();
+  const uses = packingFor(t).uses;
+  const locs = filledLocations(days);
+  return bar + `<div class="days">${days.map((d, i) => dayCard(t, d, i, days.length, locs[i], items, uses)).join('')}</div>`;
+}
+function dayCard(t, d, i, n, inherited, items, uses) {
+  const w = d.weather;
+  const outfits = (t.plan?.outfits || []).map((o, idx) => ({ ...o, idx })).filter(o => o.date === d.date)
+    .sort((a, b) => (SLOT_ORDER[a.slot] ?? 9) - (SLOT_ORDER[b.slot] ?? 9) || String(a.who).localeCompare(String(b.who)));
+  const plans = parsePlans(d.plans);
+  const multi = travelersOf(t).length > 1;
+  const wx = w ? `<div class="wx sky-${esc(w.sky || 'sun')}">${I(SKY_SVG[w.sky] || SKY_SVG.sun, 30)}<span class="temps">${temp(w.hi)}° <span class="lo">/ ${temp(w.lo)}°</span></span>${w.rain != null ? `<span class="rainp">${Math.round(w.rain)}% rain</span>` : '<span></span>'}</div>${w.summary ? `<p class="wxsum">${esc(w.summary)}</p>` : ''}<span class="tag${w.source === 'manual' ? ' accent' : ''}" title="${esc(SRC_TITLE[w.source] || '')}">${esc(SRC[w.source] || 'Typical')}</span>` : `<p class="wxsum">No weather yet</p>`;
+  return `<article class="day" id="day-${esc(d.date)}">
+    <div class="stub">
+      <span class="daynum">Day ${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+      <span class="date">${esc(fmtWeekday(d.date))} ${esc(fmtDay(d.date))}</span>
+      ${d.location ? `<span class="loc">${esc(d.location)}</span>` : inherited ? `<span class="loc empty">${esc(inherited)}</span>` : `<span class="loc empty">Place not set</span>`}
+      <div class="wxcol">${wx}</div>
+    </div>
+    <div class="daybody">
+      ${plans.length ? `<ul class="plans">${plans.map(p => `<li><span class="t">${esc(p.t)}</span><span>${esc(p.text)}</span></li>`).join('')}</ul>` : `<p class="muted small" style="margin:0">No plans added for this day.</p>`}
+      ${outfits.length ? `<div class="outfits">${outfits.map(o => outfitCard(t, o, items, uses, multi)).join('')}</div>` : ''}
+      ${S.canWrite ? `<div class="dayacts"><button class="btn small ghost" data-act="editDay" data-i="${i}">${ICON.edit}Edit day</button><button class="btn small ghost" data-act="addOutfit" data-date="${esc(d.date)}">${ICON.plus}Add outfit</button></div>` : ''}
+    </div>
+  </article>`;
+}
+function outfitCard(t, o, items, uses, multi) {
+  const editing = S.editOutfit === o.idx;
+  const ids = (o.itemIds || []);
+  const rows = ids.map(id => {
+    const it = items.get(id);
+    const u = uses.get(id);
+    const dates = u ? new Set(u.map(x => x.date)).size : 0;
+    return `<li>${thumb(it)}<span>${it ? esc(it.name) : '<span class="muted">Removed item</span>'}</span>${editing ? `<button class="x" data-act="rmFromOutfit" data-i="${o.idx}" data-id="${esc(id)}" aria-label="Remove ${esc(it?.name || 'item')}">${ICON.x}</button>` : dates > 1 ? `<span class="rep" title="Worn on ${dates} days">×${dates}</span>` : ''}</li>`;
+  }).join('');
+  let edit = '';
+  if (editing) {
+    const pool = planItemsFor(t).filter(i => !ids.includes(i.id) && (!multi || !o.who || !i.owner || i.owner === o.who))
+      .sort((a, b) => CAT_KEYS.indexOf(a.category) - CAT_KEYS.indexOf(b.category) || a.name.localeCompare(b.name));
+    edit = `<div class="oedit">
+      <input id="ol-${o.idx}" data-act="outfitLabel" data-i="${o.idx}" value="${esc(o.label || '')}" placeholder="What’s it for? e.g. Dinner at the harbor" aria-label="Outfit label">
+      <div class="two">
+        <select data-act="outfitSlot" data-i="${o.idx}" aria-label="Part of day">${SLOTS.map(([k, l]) => `<option value="${k}"${o.slot === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
+        ${multi ? `<select data-act="outfitWho" data-i="${o.idx}" aria-label="Who wears it">${travelersOf(t).map(w => `<option${o.who === w ? ' selected' : ''}>${esc(w)}</option>`).join('')}</select>` : '<span></span>'}
+      </div>
+      <select data-act="addToOutfit" data-i="${o.idx}" aria-label="Add a piece"><option value="">+ Add a piece…</option>${CATS.map(([k, l]) => { const g = pool.filter(i => i.category === k); return g.length ? `<optgroup label="${esc(l)}">${g.map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join('')}</optgroup>` : ''; }).join('')}</select>
+      <button class="btn small danger" data-act="delOutfit" data-i="${o.idx}" data-confirm="Tap again to delete">Delete outfit</button>
+    </div>`;
+  }
+  return `<div class="outfit">
+    <div class="ohead"><span class="slot">${esc(SLOT_LABEL[o.slot] || 'Outfit')}${multi && o.who ? ' · ' + esc(o.who) : ''}</span>${S.canWrite ? `<button class="btn small ghost" data-act="toggleOutfit" data-i="${o.idx}">${editing ? 'Done' : 'Edit'}</button>` : ''}</div>
+    ${o.label ? `<div class="olabel">${esc(o.label)}</div>` : ''}
+    ${rows ? `<ul class="oitems">${rows}</ul>` : `<p class="muted small" style="margin:0">No pieces yet.</p>`}
+    ${(o.needs || []).map(nd => `<div class="need">Need: ${esc(nd)}</div>`).join('')}
+    ${o.note ? `<p class="onote">${esc(o.note)}</p>` : ''}
+    ${edit}
+  </div>`;
+}
+
+/* ---------- wardrobe view ---------- */
+function wardView(t) {
+  const all = wardrobeFor(t);
+  const uses = packingFor(t).uses;
+  const counts = {}; all.forEach(i => { counts[i.category] = (counts[i.category] || 0) + 1; });
+  const buy = all.filter(i => i.status === 'to-buy').length;
+  if (S.filter !== 'all' && S.filter !== 'to-buy' && !counts[S.filter]) S.filter = 'all';
+  const shown = all.filter(i => S.filter === 'all' || (S.filter === 'to-buy' ? i.status === 'to-buy' : i.category === S.filter))
+    .sort((a, b) => CAT_KEYS.indexOf(a.category) - CAT_KEYS.indexOf(b.category) || String(a.name).localeCompare(String(b.name)));
+  const canAdd = S.canWrite && !t.example;
+  const multi = new Set(all.map(i => i.owner || 'Me')).size > 1;
+  const bar = canAdd ? `<div class="toolbar">
+      ${aiReady() && S.imagesOk ? `<label class="btn primary" for="photoIn" role="button" tabindex="0">${ICON.camera}Add from photos</label>` : ''}
+      ${aiReady() ? `<button class="btn" data-act="links">${ICON.link}Paste links</button>` : ''}
+      <button class="btn" data-act="newItem">${ICON.plus}Add by hand</button>
+    </div>` : '';
+  const exNote = t.example ? `<div class="banner"><p>These are example clothes for the example trip. Your own wardrobe shows up when you open one of your trips, and it carries over to every trip you plan.</p></div>` : '';
+  if (!all.length) {
+    return bar + `<div class="empty"><h3>Your wardrobe is empty</h3><p>Add what you’re thinking of bringing. Photograph pieces on the bed or hanger, screenshot an order, or paste the links of things you bought. Claude reads each one into a tagged item.</p></div>`;
+  }
+  const chip = (k, label, n) => `<button class="chip" data-act="filter" data-f="${k}" aria-pressed="${S.filter === k}">${esc(label)}<span class="n">${n}</span></button>`;
+  return bar + exNote + `<div class="chips">${chip('all', 'All', all.length)}${CATS.filter(([k]) => counts[k]).map(([k, l]) => chip(k, l, counts[k])).join('')}${buy ? chip('to-buy', 'Need to buy', buy) : ''}</div>
+    <div class="grid">${shown.map(i => {
+      const u = uses.get(i.id); const n = u ? u.length : 0;
+      const sw = hexOk(i.colorHex) ? ` style="--sw:${i.colorHex}"` : '';
+      return `<button class="item" data-act="editItem" data-id="${esc(i.id)}"${t.example && !S.canWrite ? ' disabled' : ''}>
+        <span class="ph"${sw}>${i.photo ? `<img src="${photoUrl(i.photo)}" alt="" loading="lazy">` : ''}<span class="hole"></span><span class="cat">${esc(CAT_ONE[i.category] || 'Other')}</span></span>
+        <span class="meta"><span class="nm">${esc(i.name)}</span>
+          <span class="sub">${esc([i.color, WARMTH[i.warmth], FORMALITY[i.formality], multi ? (i.owner || 'Me') : ''].filter(Boolean).join(' · '))}</span>
+          <span class="badges">${i.status && i.status !== 'own' ? `<span class="tag ${i.status === 'to-buy' ? 'bad' : 'brass'}">${esc(STATUS[i.status])}</span>` : ''}${n ? `<span class="tag accent">${n} outfit${n === 1 ? '' : 's'}</span>` : ''}</span>
+        </span>
+      </button>`;
+    }).join('')}</div>`;
+}
+
+/* ---------- packing ---------- */
+function packingFor(t) {
+  const items = itemMap();
+  const uses = new Map();
+  (t?.plan?.outfits || []).forEach(o => (o.itemIds || []).forEach(id => {
+    if (!items.has(id)) return;
+    if (!uses.has(id)) uses.set(id, []);
+    uses.get(id).push(o);
+  }));
+  const clothes = [...uses.keys()].map(id => items.get(id));
+  const extras = t?.plan?.extras || [];
+  const packed = t?.packed || {};
+  const keys = [...clothes.map(i => 'i:' + i.id), ...extras.map(x => 'x:' + slug(x.name))];
+  return { uses, clothes, extras, total: keys.length, done: keys.filter(k => packed[k]).length, packed };
+}
+function packView(t) {
+  if (!t.plan?.outfits?.length) {
+    return `<div class="empty"><h3>Plan outfits first</h3><p>Your packing list is built from the outfit plan: every piece you’ll wear, how many times, plus the extras your destinations call for.</p>${aiReady() && S.canWrite && (t.days || []).length ? `<button class="btn primary" data-act="plan">${ICON.spark}Plan outfits</button>` : ''}</div>`;
+  }
+  const pk = packingFor(t);
+  const tv = travelersOf(t);
+  const multi = tv.length > 1;
+  const pct = pk.total ? Math.round(pk.done / pk.total * 100) : 0;
+  const check = (key, name, right, why = '') => `<li><label class="${pk.packed[key] ? 'done' : ''}"><input type="checkbox" data-act="pack" data-k="${esc(key)}"${pk.packed[key] ? ' checked' : ''}${S.canWrite ? '' : ' disabled'}><span class="nm">${esc(name)}${why ? `<span class="why">${esc(why)}</span>` : ''}</span><span class="qty">${esc(right)}</span></label></li>`;
+  const clothesBlock = who => {
+    const mine = pk.clothes.filter(i => !multi || (i.owner || tv[0]) === who);
+    return CATS.map(([k, l]) => {
+      const g = mine.filter(i => i.category === k);
+      if (!g.length) return '';
+      return `<div><h3 class="sec">${esc(l)}</h3><ul class="checks">${g.map(i => { const n = new Set(pk.uses.get(i.id).map(o => o.date)).size; return check('i:' + i.id, i.name, `${n} day${n === 1 ? '' : 's'}`); }).join('')}</ul></div>`;
+    }).join('');
+  };
+  const exGroups = {};
+  pk.extras.forEach(x => { const c = x.category || 'Other'; (exGroups[c] = exGroups[c] || []).push(x); });
+  const missing = (t.plan.missing || []).map((m, idx) => ({ ...m, idx }));
+  const repeats = pk.clothes.map(i => ({ i, days: [...new Set(pk.uses.get(i.id).map(o => o.date))].sort() })).filter(r => r.days.length > 1).sort((a, b) => b.days.length - a.days.length);
+  const used = new Set(pk.uses.keys());
+  const home = planItemsFor(t).filter(i => !used.has(i.id) && i.status !== 'to-buy');
+  return `<div class="pack">
+    <div class="col">
+      <div class="progress"><div class="lbl"><span><b>${pk.done}</b> of <b>${pk.total}</b> packed</span><span>${pct}%</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+      <div class="toolbar"><button class="btn small" data-act="copyList">${ICON.copy}Copy list</button>${S.canWrite && pk.done ? `<button class="btn small ghost" data-act="resetPacked" data-confirm="Tap again to untick all">Untick all</button>` : ''}</div>
+      ${multi ? tv.map(w => `<div class="col"><h2 class="big">${esc(w)}</h2>${clothesBlock(w) || '<p class="muted small">Nothing planned yet.</p>'}</div>`).join('') : `<div class="col"><h2 class="big">Clothes</h2>${clothesBlock(tv[0])}</div>`}
+      ${pk.extras.length ? `<div class="col"><h2 class="big">Also pack</h2>${Object.entries(exGroups).map(([c, xs]) => `<div><h3 class="sec">${esc(c)}</h3><ul class="checks">${xs.map(x => check('x:' + slug(x.name), x.name, x.qty > 1 ? '×' + x.qty : '', x.why || '')).join('')}</ul></div>`).join('')}</div>` : ''}
+    </div>
+    <div class="col">
+      ${missing.length ? `<div class="panel alert"><h2>What you’re missing</h2><p class="lead">Pieces the plan needs that aren’t in your wardrobe.</p><ul class="rows">${missing.map(m => `<li><div><b>${esc(m.name)}</b> ${m.priority === 'must' ? '<span class="tag bad">Must</span>' : '<span class="tag">Nice to have</span>'}<span class="why">${esc(m.why || '')}</span></div>${S.canWrite && !t.example ? (m.added ? '<span class="tag good">On list</span>' : `<button class="btn small" data-act="buyMissing" data-i="${m.idx}">Add to buy list</button>`) : ''}</li>`).join('')}</ul></div>` : ''}
+      ${repeats.length ? `<div class="panel"><h2>Wear again</h2><p class="lead">Pieces doing the most work, so they earn their space.</p><ul class="rows">${repeats.slice(0, 12).map(r => `<li>${thumb(r.i)}<div><b>${esc(r.i.name)}</b><span class="why">${r.days.length} days: ${esc(r.days.map(fmtDay).join(', '))}</span></div></li>`).join('')}</ul></div>` : ''}
+      ${home.length ? `<div class="panel"><h2>Leave at home</h2><p class="lead">In your wardrobe but not in any outfit.</p><ul class="rows">${home.map(i => `<li>${thumb(i)}<div>${esc(i.name)}<span class="why">${esc(CAT_ONE[i.category] || '')}${i.owner && multi ? ' · ' + esc(i.owner) : ''}</span></div></li>`).join('')}</ul></div>` : ''}
+      ${(t.plan.tips || []).length ? `<div class="panel"><h2>Packing tips</h2><ul class="tips">${t.plan.tips.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    </div>
+  </div>`;
+}
+
+/* ---------- dialogs ---------- */
+const dlg = $('#dlg');
+function openDlg(html) { dlg.innerHTML = html; if (!dlg.open) dlg.showModal(); const f = dlg.querySelector('input:not([type=hidden]):not([type=file]), textarea, select'); if (f && matchMedia('(pointer: fine)').matches) f.focus(); }
+function closeDlg() { if (dlg.open) dlg.close(); }
+dlg.addEventListener('close', () => { if (S.dlgNew) dropPhoto(S.dlgNew); S.dlgNew = null; S.dlgPhoto = undefined; });
+function dlgErr(msg) { let el = $('#dlgErr', dlg); if (!el) { el = document.createElement('p'); el.id = 'dlgErr'; el.className = 'err'; el.setAttribute('role', 'alert'); dlg.querySelector('.actions')?.before(el); } el.textContent = msg; }
+
+function tripForm(t) {
+  const isNew = !t;
+  t = t || { name: '', kind: 'honeymoon', start: '', end: '', travelers: ['Me'], luggage: 'checked', laundry: false, style: '' };
+  return `<form id="tripForm" data-new="${isNew ? 1 : 0}">
+    <h2 id="dlgTitle">${isNew ? 'New trip' : 'Edit trip'}</h2>
+    <label class="field">Trip name<input id="f-name" required maxlength="80" value="${esc(t.name)}" placeholder="Our honeymoon in Greece"></label>
+    <div class="row2">
+      <label class="field">Kind of trip<select id="f-kind">${KINDS.map(([k, l]) => `<option value="${k}"${t.kind === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label class="field">Luggage<select id="f-lug"><option value="checked"${t.luggage !== 'carry-on' ? ' selected' : ''}>Checked bag</option><option value="carry-on"${t.luggage === 'carry-on' ? ' selected' : ''}>Carry-on only</option></select></label>
+    </div>
+    <div class="row2">
+      <label class="field">First day<input type="date" id="f-start" value="${esc(t.start || '')}"></label>
+      <label class="field">Last day<input type="date" id="f-end" value="${esc(t.end || '')}"></label>
+    </div>
+    <label class="field">Who you’re packing for<input id="f-trav" value="${esc(travelersOf(t).join(', '))}" placeholder="Me, Sam"><span class="hint">Separate names with commas. Each person gets their own outfits.</span></label>
+    <label class="field check"><input type="checkbox" id="f-laundry"${t.laundry ? ' checked' : ''}>Laundry available during the trip</label>
+    <label class="field">Style and dress codes<textarea id="f-style" maxlength="1000" placeholder="Light colors and linen, comfortable flats for cobblestones, one very dressy dinner, nothing too revealing for church visits">${esc(t.style || '')}</textarea></label>
+    <div class="actions">
+      ${!isNew ? `<button type="button" class="btn danger left" data-act="delTrip" data-confirm="Tap again to delete trip">Delete trip</button>` : ''}
+      <button type="button" class="btn" data-act="closeDlg">Cancel</button>
+      <button class="btn primary" type="submit">${isNew ? 'Create trip' : 'Save'}</button>
+    </div>
+  </form>`;
+}
+function buildDays(start, end, old) {
+  const byDate = new Map((old || []).map(d => [d.date, d]));
+  return dateList(start, end).map(date => byDate.get(date) ? structuredClone(byDate.get(date)) : { date, location: '', plans: '', weather: null });
+}
+async function saveTrip(f) {
+  const isNew = f.dataset.new === '1';
+  const name = str($('#f-name', f).value, 80);
+  const start = $('#f-start', f).value, end = $('#f-end', f).value || start;
+  if (!name) return dlgErr('Give the trip a name.');
+  if ((start && !isISO(start)) || (end && !isISO(end))) return dlgErr('Enter the dates as full dates.');
+  if (start && end < start) return dlgErr('The last day comes before the first day. Check the dates.');
+  if (start && dateList(start, end).length > 60) return dlgErr('Trips can be up to 60 days long. Split a longer trip into parts.');
+  const travelers = [...new Set($('#f-trav', f).value.split(',').map(s => str(s, 30)).filter(Boolean))].slice(0, 6);
+  const patch = {
+    name, kind: $('#f-kind', f).value, luggage: $('#f-lug', f).value, laundry: $('#f-laundry', f).checked,
+    travelers: travelers.length ? travelers : ['Me'], style: str($('#f-style', f).value, 1000),
+    start: start || '', end: start ? end : ''
+  };
+  if (isNew) {
+    const ref = S.db.collection('trips').doc();
+    S.tripId = ref.id; lsSet('tw.trip', ref.id);
+    closeDlg();
+    const ok = await write('trips/' + ref.id, () => ref.set({ ...patch, days: buildDays(patch.start, patch.end, []), plan: null, packed: {}, example: false, createdAt: Date.now(), updatedAt: Date.now() }));
+    if (ok) { location.hash = '#days'; toast('Trip created. Paste your itinerary or fill in each day.'); }
+  } else {
+    const t = curTrip(); if (!t) return closeDlg();
+    patch.days = buildDays(patch.start, patch.end, t.days);
+    closeDlg();
+    if (await updTrip(t.id, patch)) toast('Trip saved');
+  }
+}
+
+function dayForm(t, i) {
+  const d = t.days[i], w = d.weather || {};
+  return `<form id="dayForm" data-i="${i}">
+    <h2 id="dlgTitle">${esc(fmtWeekday(d.date))} ${esc(fmtDay(d.date))}</h2>
+    <label class="field">Where you are<input id="f-loc" maxlength="80" value="${esc(d.location || '')}" placeholder="Positano, Italy"></label>
+    <label class="field">Plans<textarea id="f-plans" maxlength="2000" placeholder="10:00 Boat tour with swim stops&#10;20:30 Dinner at La Sponda (dressy)">${esc(d.plans || '')}</textarea><span class="hint">One plan per line. Start with a time if you have one. Mention dress codes and activities, since they decide the outfits.</span></label>
+    <fieldset class="field" style="border:0;padding:0;margin:0;gap:8px">
+      <legend style="padding:0;margin-bottom:6px">Weather (°${S.unit})</legend>
+      <div class="row3">
+        <label class="field">High<input id="f-hi" type="number" inputmode="decimal" value="${w.hi != null ? temp(w.hi) : ''}"></label>
+        <label class="field">Low<input id="f-lo" type="number" inputmode="decimal" value="${w.lo != null ? temp(w.lo) : ''}"></label>
+        <label class="field">Rain %<input id="f-rain" type="number" min="0" max="100" inputmode="numeric" value="${w.rain != null ? Math.round(w.rain) : ''}"></label>
+      </div>
+      <div class="row2">
+        <label class="field">Sky<select id="f-sky"><option value="">Not set</option>${SKIES.map(([k, l]) => `<option value="${k}"${w.sky === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="field">Notes<input id="f-wxsum" maxlength="120" value="${esc(w.summary || '')}" placeholder="Cool evenings, strong sun"></label>
+      </div>
+      <span class="hint">${w.source === 'typical' ? 'These are typical values Claude estimated. Change them and they’re marked as your entry.' : 'Leave blank and use Estimate weather to fill typical values.'}</span>
+    </fieldset>
+    <div class="actions"><button type="button" class="btn" data-act="closeDlg">Cancel</button><button class="btn primary" type="submit">Save day</button></div>
+  </form>`;
+}
+async function saveDay(f) {
+  const t = curTrip(); if (!t) return closeDlg();
+  const i = Number(f.dataset.i); const days = structuredClone(t.days || []); const d = days[i]; if (!d) return closeDlg();
+  d.location = str($('#f-loc', f).value, 80);
+  d.plans = str($('#f-plans', f).value, 2000);
+  const old = d.weather || {};
+  const nw = { hi: toC($('#f-hi', f).value), lo: toC($('#f-lo', f).value), rain: num($('#f-rain', f).value), sky: $('#f-sky', f).value || null, summary: str($('#f-wxsum', f).value, 120) };
+  const oldShown = { hi: old.hi != null ? toC(temp(old.hi)) : null, lo: old.lo != null ? toC(temp(old.lo)) : null, rain: old.rain != null ? Math.round(old.rain) : null, sky: old.sky || null, summary: old.summary || '' };
+  const changed = ['hi', 'lo', 'rain', 'sky', 'summary'].some(k => (nw[k] ?? '') !== (oldShown[k] ?? ''));
+  const empty = nw.hi == null && nw.lo == null && nw.rain == null && !nw.sky && !nw.summary;
+  if (changed) d.weather = empty ? null : { ...nw, hi: nw.hi ?? old.hi ?? null, lo: nw.lo ?? old.lo ?? null, source: 'manual', at: today() };
+  closeDlg();
+  if (await updTrip(t.id, { days })) toast('Day saved');
+}
+
+function itemForm(it) {
+  const isNew = !it;
+  const t = curTrip();
+  const owners = [...new Set([...travelersOf(t), ...S.wardrobe.filter(i => !i.example).map(i => i.owner).filter(Boolean)])];
+  it = it || { name: '', category: 'top', color: '', colorHex: '#c8c2cc', warmth: 'mid', formality: 'casual', status: 'own', owner: travelersOf(t)[0], link: '', notes: '', tags: [] };
+  S.dlgPhoto = it.photo || null;
+  return `<form id="itemForm" data-id="${esc(it.id || '')}">
+    <h2 id="dlgTitle">${isNew ? 'Add a piece' : 'Edit piece'}</h2>
+    <div class="photoedit">${thumb(it, 'thumb" id="f-thumb')}<div class="toolbar">${S.assets ? `<label class="btn small" for="f-photo" role="button" tabindex="0">${ICON.camera}${it.photo ? 'Replace photo' : 'Add photo'}</label><input type="file" id="f-photo" class="vh" accept="image/*">` : ''}${it.link ? `<a class="btn small ghost" href="${esc(it.link)}" target="_blank" rel="noopener">${ICON.link}Open link</a>` : ''}</div></div>
+    <label class="field">Name<input id="f-iname" required maxlength="80" value="${esc(it.name)}" placeholder="White linen button-up shirt"></label>
+    <div class="row2">
+      <label class="field">Category<select id="f-cat">${CATS.map(([k, l]) => `<option value="${k}"${it.category === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label class="field">Status<select id="f-status">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}"${it.status === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    <div class="row2">
+      <label class="field">Color<input id="f-color" maxlength="30" value="${esc(it.color || '')}" placeholder="Navy"></label>
+      <label class="field">Swatch<input id="f-hex" type="color" value="${hexOk(it.colorHex) ? it.colorHex : '#c8c2cc'}"></label>
+    </div>
+    <div class="row2">
+      <label class="field">Best for<select id="f-warm">${Object.entries(WARMTH).map(([k, l]) => `<option value="${k}"${it.warmth === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label class="field">Dressiness<select id="f-form">${Object.entries(FORMALITY).map(([k, l]) => `<option value="${k}"${it.formality === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    ${owners.length > 1 ? `<label class="field">Whose is it<select id="f-owner">${owners.map(o => `<option${(it.owner || owners[0]) === o ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select></label>` : ''}
+    <label class="field">Link<input id="f-link" type="url" maxlength="500" value="${esc(it.link || '')}" placeholder="https://"></label>
+    <label class="field">Notes<input id="f-notes" maxlength="300" value="${esc(it.notes || '')}" placeholder="Wrinkles easily; size up"></label>
+    <div class="actions">
+      ${!isNew ? `<button type="button" class="btn danger left" data-act="delItem" data-id="${esc(it.id)}" data-confirm="Tap again to delete">Delete</button>` : ''}
+      <button type="button" class="btn" data-act="closeDlg">Cancel</button>
+      <button class="btn primary" type="submit">${isNew ? 'Add piece' : 'Save'}</button>
+    </div>
+  </form>`;
+}
+async function saveItem(f) {
+  const id = f.dataset.id;
+  const name = str($('#f-iname', f).value, 80);
+  if (!name) return dlgErr('Give the piece a name.');
+  const link = str($('#f-link', f).value, 500);
+  if (link && !/^https?:\/\//i.test(link)) return dlgErr('Links need to start with http:// or https://');
+  const t = curTrip();
+  const data = {
+    name, category: $('#f-cat', f).value, status: $('#f-status', f).value, color: str($('#f-color', f).value, 30), colorHex: $('#f-hex', f).value,
+    warmth: $('#f-warm', f).value, formality: $('#f-form', f).value, owner: $('#f-owner', f)?.value || travelersOf(t)[0], link, notes: str($('#f-notes', f).value, 300),
+    photo: S.dlgPhoto || null
+  };
+  const old = id ? S.wardrobe.find(i => i.id === id) : null;
+  S.dlgNew = null;
+  closeDlg();
+  if (id) {
+    if (await write('wardrobe/' + id, () => S.db.doc('wardrobe/' + id).update(data))) {
+      toast('Saved');
+      if (old?.photo && old.photo !== data.photo) dropPhoto(old.photo, id);
+    }
+  } else {
+    const ref = S.db.collection('wardrobe').doc();
+    if (await write('wardrobe/' + ref.id, () => ref.set({ ...data, tags: [], example: false, createdAt: Date.now() }))) toast('Added to your wardrobe');
+  }
+}
+async function dropPhoto(assetId, exceptItemId) {
+  if (!S.assets || !assetId) return;
+  if (S.wardrobe.some(i => i.id !== exceptItemId && i.photo === assetId)) return;
+  try { await S.assets.delete(assetId); } catch {}
+}
+
+function textForm(id, title, lead, ph, btn) {
+  return `<form id="${id}">
+    <h2 id="dlgTitle">${esc(title)}</h2>
+    <p class="lead">${esc(lead)}</p>
+    <label class="field"><span class="vh">${esc(title)}</span><textarea id="f-text" required maxlength="20000" style="min-height:220px" placeholder="${esc(ph)}"></textarea></label>
+    <div class="actions"><button type="button" class="btn" data-act="closeDlg">Cancel</button><button class="btn primary" type="submit">${ICON.spark}${esc(btn)}</button></div>
+  </form>`;
+}
+
+/* ---------- AI: prompts ---------- */
+const ITEM_RULES = `category is one of: ${CAT_KEYS.join(', ')} ("layer" means jackets, cardigans, sweaters, blazers, coats; "dress" includes jumpsuits and matching sets). warmth is "light" (hot weather), "mid", or "warm" (cold weather). formality is "casual", "smart", or "dressy". name is 3 to 7 words, specific enough to tell similar pieces apart (fabric, cut, color). colorHex is your best guess at the main color as #rrggbb. tags are up to 4 short words about fabric, style or use (for example "linen", "packable", "wrinkles easily", "sun protection").`;
+
+function photoPrompt() {
+  return `You are cataloguing clothes for a travel packing app. The attached photo shows one or more clothing items, shoes, swimwear, bags or accessories. It may be a product photo, pieces laid out on a bed, an outfit on a person, or a screenshot of an online order.
+
+List each distinct wearable piece you can see clearly. Ignore furniture, bodies, and background objects. For an order screenshot, list the products in it.
+
+Reply with only JSON:
+{"items":[{"name":"White linen button-up shirt","category":"top","color":"white","colorHex":"#f2efe8","warmth":"light","formality":"smart","tags":["linen","breathable"],"notes":""}]}
+${ITEM_RULES}
+If nothing wearable is visible, reply {"items":[]}.`;
+}
+function linksPrompt(text) {
+  return `A traveler pasted links to clothes and accessories they bought for a trip, and maybe text copied from order emails. You cannot open links. Work out each product from the words in the URL (product pages usually name the item in the path) and from any text. If a link has no readable product words, still include it with the name "Item from <store name>" and notes "Open the link to fill in details".
+
+Pasted text:
+"""
+${text.slice(0, 20000)}
+"""
+
+Reply with only JSON:
+{"items":[{"name":"Navy wide-leg linen trousers","category":"bottom","color":"navy","colorHex":"#23305a","warmth":"light","formality":"smart","tags":["linen"],"status":"own","link":"https://…","notes":""}]}
+${ITEM_RULES}
+status is "own" if it was bought and arrived or the text doesn't say, and "ordered" if the text says it hasn't arrived yet. link is that product's URL, or "" if there is none. List each product once.`;
+}
+function itineraryPrompt(t, text) {
+  return `Turn this trip itinerary into structured days for a packing and outfit planner.
+
+Trip so far: "${t.name}"${isISO(t.start) ? `, ${t.start} to ${t.end}` : ', no dates yet'}. Today is ${today()}. If the itinerary gives dates without a year, use the next time those dates come around after today. If it gives no dates at all but the trip has dates, map "Day 1" to the trip's first day.
+
+Itinerary pasted by the traveler:
+"""
+${text.slice(0, 20000)}
+"""
+
+Reply with only JSON:
+{"name":"Amalfi Coast & Rome","start":"YYYY-MM-DD","end":"YYYY-MM-DD","days":[{"date":"YYYY-MM-DD","location":"Positano, Italy","plans":["10:00 Private boat tour around Capri (swim stops)","20:30 Dinner at La Sponda (dressy)"]}]}
+
+Rules: one entry per calendar day the itinerary covers, travel days included. location is the town or city where most of the day is spent, written "Town, Country"; on a travel day use where you end up; on a cruise use the port, or "At sea". Each plan is one short line, starting with a 24-hour time when the itinerary gives one. Keep dress codes, activities and venue types (beach club, hike, fine dining, temple, wedding, spa) in the text because they decide outfits. Leave out booking numbers, prices and addresses. name is "" unless the itinerary suggests a good trip name.`;
+}
+function weatherPrompt(list) {
+  return `You are a travel weather assistant. For each date and place below, give the TYPICAL weather for that place at that time of year, based on climate normals (long-term averages). This is not a live forecast and you cannot browse. Be specific to the local climate: coast versus inland, altitude, sea breezes, rainy or monsoon seasons.
+
+Days:
+${list.map(x => `${x.date} - ${x.place}`).join('\n')}
+
+Reply with only JSON:
+{"days":[{"date":"YYYY-MM-DD","hi":27,"lo":19,"rain":15,"sky":"sun","summary":"Sunny and dry, sea breeze, sea about 23°C"}]}
+hi and lo are the typical daily high and low air temperature in °C (numbers). rain is the typical chance of rain that day as a whole-number percent. sky is one of: sun, partly, cloud, rain, storm, snow, wind. summary is at most 10 words and names what matters for clothing (humidity, wind, strong sun, cool evenings, afternoon storms, sea temperature for beach places).`;
+}
+function planPrompt(t, items) {
+  const tv = travelersOf(t);
+  const days = (t.days || []);
+  const locs = filledLocations(days);
+  const dayLines = days.map((d, i) => {
+    const w = d.weather;
+    const plans = parsePlans(d.plans).map(p => (p.t ? p.t + ' ' : '') + p.text).join('; ');
+    return `Day ${i + 1}, ${d.date} (${fmtWeekday(d.date)}), ${locs[i] || 'place unknown'}. Weather: ${w ? `high ${w.hi ?? '?'}°C, low ${w.lo ?? '?'}°C, ${w.rain ?? '?'}% rain chance${w.summary ? ', ' + w.summary : ''}` : 'unknown'}. Plans: ${plans || 'none listed'}.`;
+  }).join('\n');
+  const itemLines = items.map(i => [i.id, i.name, i.category, i.color || '', 'warmth ' + (i.warmth || 'mid'), i.formality || 'casual', 'owner ' + (i.owner || tv[0]), i.status && i.status !== 'own' ? STATUS[i.status] : '', (i.tags || []).join(', ')].filter(Boolean).join(' | ')).join('\n');
+  return `You are a thoughtful travel stylist planning outfits and packing for a trip, using the traveler's actual wardrobe.
+
+TRIP
+Name: ${t.name}
+Kind: ${KIND_LABEL[t.kind] || 'Trip'}
+Dress these travelers: ${tv.join(', ')}
+Luggage: ${t.luggage === 'carry-on' ? 'carry-on only, so build a small capsule and repeat pieces often' : 'checked bag'}
+Laundry during the trip: ${t.laundry ? 'yes' : 'no'}
+Style notes: ${t.style || 'none given'}
+
+DAYS
+${dayLines}
+
+WARDROBE (id | name | category | color | warmth | formality | owner | status | tags)
+${itemLines || '(empty: the traveler has not added clothes yet, so describe what each outfit needs instead)'}
+
+TASK
+1. For each day and each traveler, plan the outfits the day needs: usually one "day" outfit; a "travel" outfit on days spent getting somewhere; an "activity" outfit for swimming, boats, hiking, gym or spa; and an "evening" outfit when there are dinner or night plans (cruises usually have dinners every night). Don't add outfits a day doesn't need.
+2. Use only ids from the wardrobe, and only pieces whose owner is that traveler. Make each outfit complete: a top and bottom or a dress, shoes, plus a layer when the low is under 18°C or it's windy or on the water, and rain protection when rain chance is 40% or more. Accessories and bags are optional.
+3. Repeat pieces sensibly: bottoms, shoes, layers, bags and swimwear can repeat often; avoid repeating a standout piece in photos at the same place; with carry-on luggage keep the total small.
+4. Respect dress codes and activities in the plans: covered shoulders and knees for religious sites, dressier pieces for fine dining, flat shoes and a layer for boats, real shoes for hikes.
+5. When an outfit needs something the wardrobe lacks, describe it briefly in that outfit's "needs" and list it once in "missing".
+6. "extras" lists non-clothing things to pack for this trip: toiletries, sun care, health, tech and plug adapters, documents, beach or activity gear, plus underwear, socks and sleepwear with quantities. Make them specific to these places, weather and plans.
+
+Reply with only JSON:
+{"outfits":[{"date":"YYYY-MM-DD","slot":"day","who":${JSON.stringify(tv[0])},"label":"Lanes and beach lunch","itemIds":["<id>","<id>"],"needs":[],"note":"Hat for the midday sun"}],
+ "missing":[{"name":"Packable rain jacket","category":"layer","why":"40% rain chance in Rome on Jun 18","priority":"must"}],
+ "extras":[{"name":"Reef-safe sunscreen SPF 50","category":"Sun & health","qty":1,"why":"Boat day and beach"}],
+ "tips":["Wear your bulkiest shoes on the plane"]}
+slot is one of: travel, day, activity, evening. priority is "must" or "nice". label is at most 6 words, note at most 16 words, why at most 14 words. Give at most 4 tips. extras categories are short title-case groups such as "Toiletries", "Sun & health", "Tech", "Documents", "Underwear & sleep", "Beach gear".`;
+}
+
+/* ---------- AI: actions ---------- */
+function normItem(it, extra) {
+  return {
+    name: str(it?.name, 80) || 'Unnamed piece',
+    category: CAT_KEYS.includes(it?.category) ? it.category : 'other',
+    color: str(it?.color, 30),
+    colorHex: hexOk(it?.colorHex) ? it.colorHex.toLowerCase() : '',
+    warmth: ['light', 'mid', 'warm'].includes(it?.warmth) ? it.warmth : 'mid',
+    formality: ['casual', 'smart', 'dressy'].includes(it?.formality) ? it.formality : 'casual',
+    tags: Array.isArray(it?.tags) ? it.tags.slice(0, 5).map(x => str(x, 24)).filter(Boolean) : [],
+    status: ['own', 'ordered', 'to-buy'].includes(it?.status) ? it.status : 'own',
+    link: /^https?:\/\//i.test(it?.link || '') ? str(it.link, 500) : '',
+    notes: str(it?.notes, 300),
+    photo: null, owner: travelersOf(curTrip())[0], example: false, createdAt: Date.now(),
+    ...extra
+  };
+}
+async function addItems(list) {
+  let n = 0;
+  for (const data of list) {
+    const ref = S.db.collection('wardrobe').doc();
+    if (await write('wardrobe/' + ref.id, () => ref.set(data))) n++;
+  }
+  return n;
+}
+async function shrink(file, max = 1280) {
+  let src, url;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch {
+    url = URL.createObjectURL(file);
+    src = await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = () => rej(new Error('decode')); img.src = url; });
+  }
+  try {
+    const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+    const k = Math.min(1, max / Math.max(w, h));
+    const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    return await new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('decode')), 'image/jpeg', 0.86));
+  } finally { if (url) URL.revokeObjectURL(url); src.close?.(); }
+}
+function assetErr(e) {
+  const c = e?.code;
+  if (c === 'too_large') return 'That photo is too large to store.';
+  if (c === 'quota_or_state') return 'Photo storage is full. Delete some pieces with photos first.';
+  if (c === 'rate_limited') return 'Uploading too fast. Wait a moment and try again.';
+  return 'The photo couldn’t be stored, but Claude can still read it.';
+}
+function photosJob(files) {
+  const list = [...files].filter(f => f.type.startsWith('image/') || /\.(heic|heif|jpe?g|png|webp|gif)$/i.test(f.name)).slice(0, 12);
+  if (!list.length) return toast('Choose photo files (JPEG, PNG or screenshots).', true);
+  runJob('Reading your photos', `Photo 1 of ${list.length}`, async (signal, progress) => {
+    let added = 0, empty = 0;
+    for (let k = 0; k < list.length; k++) {
+      if (signal.aborted) break;
+      progress(`Photo ${k + 1} of ${list.length}: preparing`);
+      const blob = await shrink(list[k]);
+      let photo = null;
+      if (S.assets) { try { photo = (await S.assets.upload(blob, { type: 'image/jpeg' })).id; } catch (e) { toast(assetErr(e), true); } }
+      progress(`Photo ${k + 1} of ${list.length}: Claude is looking`);
+      let res;
+      try { res = await S.sample.json(photoPrompt(), { images: [blob], modelTier: 'default', signal }); }
+      catch (e) { if (photo) dropPhoto(photo); throw e; }
+      const items = Array.isArray(res?.items) ? res.items.slice(0, 12) : [];
+      if (!items.length) { empty++; if (photo) dropPhoto(photo); continue; }
+      added += await addItems(items.map(it => normItem(it, { photo })));
+    }
+    if (added) { S.filter = 'all'; toast(`Added ${added} piece${added === 1 ? '' : 's'} to your wardrobe${empty ? `. ${empty} photo${empty === 1 ? '' : 's'} had nothing Claude could recognise` : ''}.`); }
+    else if (!signal.aborted) toast('Claude didn’t find clothes in those photos. Try a clearer, closer shot.', true);
+  });
+}
+function linksJob(text) {
+  runJob('Reading your links', 'Claude is working out each product', async (signal, progress) => {
+    const res = await S.sample.json(linksPrompt(text), { modelTier: 'default', signal, onText: ({ text }) => progress(`Writing… ${text.length} characters`) });
+    const items = Array.isArray(res?.items) ? res.items.slice(0, 60) : [];
+    if (!items.length) return toast('Claude couldn’t find products in that text. Paste the product links or names.', true);
+    const n = await addItems(items.map(it => normItem(it)));
+    S.filter = 'all';
+    toast(`Added ${n} piece${n === 1 ? '' : 's'}. Tap any piece to fix details or add a photo.`);
+  });
+}
+function itineraryJob(text) {
+  const t = curTrip(); if (!t) return;
+  runJob('Reading your itinerary', 'Claude is laying out the days', async (signal, progress) => {
+    const res = await S.sample.json(itineraryPrompt(t, text), { modelTier: 'default', signal, onText: ({ text }) => progress(`Writing… ${text.length} characters`) });
+    const rdays = (Array.isArray(res?.days) ? res.days : []).filter(d => isISO(d?.date));
+    if (!rdays.length) return toast('Claude couldn’t find dates in that itinerary. Set the trip dates first, then paste it again.', true);
+    const dates = rdays.map(d => d.date).sort();
+    let start = t.start, end = t.end;
+    if (!isISO(start) || dates[0] < start) start = dates[0];
+    if (!isISO(end) || dates[dates.length - 1] > end) end = dates[dates.length - 1];
+    if (dateList(start, end).length > 60) return toast('That itinerary spans more than 60 days. Paste one part of the trip at a time.', true);
+    const fresh = latestTrip(t.id);
+    const days = buildDays(start, end, fresh.days);
+    for (const r of rdays) {
+      const d = days.find(x => x.date === r.date); if (!d) continue;
+      if (str(r.location, 80)) d.location = str(r.location, 80);
+      const have = new Set(parsePlans(d.plans).map(p => ((p.t ? p.t + ' ' : '') + p.text).toLowerCase()));
+      const add = (Array.isArray(r.plans) ? r.plans : []).map(p => str(p, 200)).filter(p => p && !have.has(p.toLowerCase()));
+      d.plans = [d.plans, ...add].filter(Boolean).join('\n').slice(0, 2000);
+    }
+    const patch = { start, end, days };
+    if (str(res.name, 80) && (!t.name || /^(new trip|untitled trip|trip)$/i.test(t.name))) patch.name = str(res.name, 80);
+    if (await updTrip(t.id, patch)) toast(`Filled in ${rdays.length} day${rdays.length === 1 ? '' : 's'}. Next: estimate the weather.`);
+  });
+}
+function latestTrip(id) { return S.trips.find(x => x.id === id) || {}; }
+function weatherJob() {
+  const t = curTrip(); if (!t) return;
+  const days = t.days || [];
+  const locs = filledLocations(days);
+  const list = days.map((d, i) => ({ date: d.date, place: locs[i] })).filter(x => x.place);
+  if (!list.length) return toast('Add a place to at least one day first (Edit day, or paste your itinerary).', true);
+  runJob('Estimating the weather', 'Claude is checking typical conditions for each day', async (signal, progress) => {
+    const res = await S.sample.json(weatherPrompt(list), { modelTier: 'default', signal, onText: ({ text }) => progress(`Writing… ${text.length} characters`) });
+    const by = new Map((Array.isArray(res?.days) ? res.days : []).filter(d => isISO(d?.date)).map(d => [d.date, d]));
+    const fresh = latestTrip(t.id);
+    const next = structuredClone(fresh.days || []);
+    let n = 0, kept = 0;
+    for (const d of next) {
+      const r = by.get(d.date); if (!r) continue;
+      if (d.weather && d.weather.source !== 'typical') { kept++; continue; }
+      d.weather = { hi: num(r.hi), lo: num(r.lo), rain: num(r.rain), sky: SKY_SVG[r.sky] ? r.sky : 'partly', summary: str(r.summary, 120), source: 'typical', at: today() };
+      n++;
+    }
+    if (!n && !kept) return toast('Claude didn’t return weather for these days. Try again.', true);
+    if (await updTrip(t.id, { days: next })) toast(`Typical weather added for ${n} day${n === 1 ? '' : 's'}${kept ? `; kept ${kept} you entered yourself` : ''}.`);
+  });
+}
+function planJob() {
+  const t = curTrip(); if (!t) return;
+  if (!(t.days || []).length) return toast('Add your trip dates first.', true);
+  const items = planItemsFor(t);
+  runJob('Planning your outfits', items.length ? `Matching ${items.length} pieces to ${(t.days || []).length} days. This can take a minute or two.` : 'Your wardrobe is empty, so Claude will describe what each outfit needs.', async (signal, progress) => {
+    const res = await S.sample.json(planPrompt(t, items), { modelTier: 'complex', signal, onText: ({ text }) => progress(`Writing the plan… ${text.length.toLocaleString()} characters`) });
+    const ids = new Set(items.map(i => i.id));
+    const dates = new Set((t.days || []).map(d => d.date));
+    const tv = travelersOf(t);
+    const outfits = (Array.isArray(res?.outfits) ? res.outfits : []).filter(o => dates.has(o?.date)).slice(0, 400).map(o => ({
+      date: o.date, slot: SLOT_LABEL[o.slot] ? o.slot : 'day', who: tv.includes(o.who) ? o.who : tv[0], label: str(o.label, 60),
+      itemIds: [...new Set((Array.isArray(o.itemIds) ? o.itemIds : []).map(String).filter(id => ids.has(id)))],
+      needs: (Array.isArray(o.needs) ? o.needs : []).map(x => str(x, 80)).filter(Boolean).slice(0, 4), note: str(o.note, 160)
+    }));
+    if (!outfits.length) return toast('Claude didn’t return any outfits. Try again.', true);
+    const missing = (Array.isArray(res?.missing) ? res.missing : []).slice(0, 30).map(m => ({ name: str(m?.name, 80), category: CAT_KEYS.includes(m?.category) ? m.category : 'other', why: str(m?.why, 160), priority: m?.priority === 'must' ? 'must' : 'nice', added: false })).filter(m => m.name);
+    const extras = (Array.isArray(res?.extras) ? res.extras : []).slice(0, 60).map(x => ({ name: str(x?.name, 80), category: str(x?.category, 30) || 'Other', qty: Math.max(1, Math.min(30, Math.round(num(x?.qty) || 1))), why: str(x?.why, 140) })).filter(x => x.name);
+    const tips = (Array.isArray(res?.tips) ? res.tips : []).map(x => str(x, 200)).filter(Boolean).slice(0, 5);
+    S.editOutfit = null;
+    if (await updTrip(t.id, { plan: { outfits, missing, extras, tips, generatedAt: Date.now() } })) toast(`Planned ${outfits.length} outfits. See the packing list for what’s missing.`);
+  });
+}
+
+/* ---------- actions ---------- */
+function armed(btn) {
+  if (!btn.dataset.confirm) return true;
+  if (btn.dataset.armed) return true;
+  btn.dataset.armed = '1';
+  const label = btn.innerHTML;
+  btn.textContent = btn.dataset.confirm;
+  setTimeout(() => { if (btn.isConnected && btn.dataset.armed) { delete btn.dataset.armed; btn.innerHTML = label; } }, 4000);
+  return false;
+}
+const ACT = {
+  unit(b) { S.unit = b.dataset.u; lsSet('tw.unit', S.unit); render(); },
+  newTrip() { openDlg(tripForm(null)); },
+  editTrip() { const t = curTrip(); if (t) openDlg(tripForm(t)); },
+  closeDlg() { closeDlg(); },
+  stopJob() { S.job?.ctl.abort(); },
+  async delTrip(b) {
+    if (!armed(b)) return;
+    const t = curTrip(); if (!t) return;
+    closeDlg();
+    if (await write('trips/' + t.id, () => tripDoc(t.id).delete())) { S.tripId = null; toast('Trip deleted'); }
+  },
+  async removeExample(b) {
+    if (!armed(b)) return;
+    const trips = S.trips.filter(t => t.example), items = S.wardrobe.filter(i => i.example);
+    for (const t of trips) await write('trips/' + t.id, () => tripDoc(t.id).delete());
+    for (const i of items) await write('wardrobe/' + i.id, () => S.db.doc('wardrobe/' + i.id).delete());
+    S.tripId = null; toast('Example removed');
+  },
+  itinerary() { openDlg(textForm('itinForm', 'Paste your itinerary', 'Paste it as it is: an email from your travel agent, a notes list, or a day-by-day plan. Claude lays out each day with the place and plans.', 'Jun 12 – Land in Naples 11:00, transfer to Positano\nJun 13 – Beach day, sunset drinks\nJun 14 – Boat tour to Capri with swim stops\nJun 15 – Path of the Gods hike; dinner at La Sponda (dressy)\n…', 'Read itinerary')); },
+  links() { openDlg(textForm('linksForm', 'Paste links to what you bought', 'Paste product links or text from order emails, one or many. Claude can’t open the pages, so it reads the product name from the link itself. Add the name next to a link if it’s just a code.', 'https://www.example-store.com/linen-wide-leg-trousers-navy-p123\nhttps://shop.example.com/products/gold-strappy-block-heel-sandal\nOrder #1234: Black one-piece swimsuit, size M', 'Add to wardrobe')); },
+  weather() { weatherJob(); },
+  plan(b) { if (!armed(b)) return; planJob(); },
+  editDay(b) { const t = curTrip(); if (t?.days?.[b.dataset.i]) openDlg(dayForm(t, Number(b.dataset.i))); },
+  newItem() { openDlg(itemForm(null)); },
+  editItem(b) { const it = S.wardrobe.find(i => i.id === b.dataset.id); if (it) openDlg(itemForm(it)); },
+  async delItem(b) {
+    if (!armed(b)) return;
+    const id = b.dataset.id; const it = S.wardrobe.find(i => i.id === id);
+    closeDlg();
+    if (await write('wardrobe/' + id, () => S.db.doc('wardrobe/' + id).delete())) { toast('Deleted'); if (it?.photo) dropPhoto(it.photo, id); }
+  },
+  filter(b) { S.filter = b.dataset.f; render(); },
+  toggleOutfit(b) { const i = Number(b.dataset.i); S.editOutfit = S.editOutfit === i ? null : i; render(); },
+  rmFromOutfit(b) { const t = curTrip(); if (!t) return; const i = Number(b.dataset.i), id = b.dataset.id; setOutfits(t, os => { if (os[i]) os[i].itemIds = (os[i].itemIds || []).filter(x => x !== id); }); },
+  delOutfit(b) { if (!armed(b)) return; const t = curTrip(); if (!t) return; const i = Number(b.dataset.i); S.editOutfit = null; setOutfits(t, os => { os.splice(i, 1); }); },
+  addOutfit(b) {
+    const t = curTrip(); if (!t) return;
+    const n = (t.plan?.outfits || []).length;
+    S.editOutfit = n;
+    setOutfits(t, os => { os.push({ date: b.dataset.date, slot: 'day', who: travelersOf(t)[0], label: '', itemIds: [], needs: [], note: '' }); });
+  },
+  async buyMissing(b) {
+    const t = curTrip(); if (!t) return;
+    const i = Number(b.dataset.i); const m = t.plan?.missing?.[i]; if (!m) return;
+    await addItems([normItem({ name: m.name, category: m.category, status: 'to-buy', notes: m.why })]);
+    const missing = structuredClone(t.plan.missing); missing[i].added = true;
+    if (await updTrip(t.id, { plan: { missing } })) toast(`${m.name} added to your wardrobe as Need to buy`);
+  },
+  async copyList() {
+    const t = curTrip(); if (!t) return;
+    const text = packingText(t);
+    try { await navigator.clipboard.writeText(text); toast('Packing list copied'); }
+    catch { openDlg(`<form id="copyForm"><h2 id="dlgTitle">Packing list</h2><p class="lead">Select all and copy.</p><label class="field"><span class="vh">Packing list</span><textarea readonly style="min-height:300px;font-family:var(--f-mono);font-size:13px">${esc(text)}</textarea></label><div class="actions"><button type="button" class="btn primary" data-act="closeDlg">Done</button></div></form>`); const ta = $('textarea', dlg); ta.focus(); ta.select(); }
+  },
+  async resetPacked(b) { if (!armed(b)) return; const t = curTrip(); if (!t) return; await write('trips/' + t.id, () => tripDoc(t.id).update({ packed: Object.fromEntries(Object.keys(t.packed || {}).map(k => [k, false])), updatedAt: Date.now() })); }
+};
+function packingText(t) {
+  const pk = packingFor(t); const lines = [`${t.name} (${fmtRange(t.start, t.end)})`, ''];
+  const box = k => pk.packed[k] ? '[x]' : '[ ]';
+  CATS.forEach(([k, l]) => { const g = pk.clothes.filter(i => i.category === k); if (!g.length) return; lines.push(l.toUpperCase()); g.forEach(i => lines.push(`${box('i:' + i.id)} ${i.name}${travelersOf(t).length > 1 ? ` (${i.owner || travelersOf(t)[0]})` : ''}`)); lines.push(''); });
+  if (pk.extras.length) { lines.push('ALSO PACK'); pk.extras.forEach(x => lines.push(`${box('x:' + slug(x.name))} ${x.name}${x.qty > 1 ? ' ×' + x.qty : ''}`)); lines.push(''); }
+  const miss = (t.plan?.missing || []); if (miss.length) { lines.push('STILL NEED'); miss.forEach(m => lines.push(`- ${m.name}${m.why ? ': ' + m.why : ''}`)); }
+  return lines.join('\n').trim();
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+  const fn = ACT[b.dataset.act]; if (!fn) return;
+  e.preventDefault(); fn(b, e);
+});
+document.addEventListener('keydown', e => {
+  const l = e.target.closest?.('label[for][role="button"]');
+  if (l && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); document.getElementById(l.htmlFor)?.click(); }
+});
+document.addEventListener('change', async e => {
+  const el = e.target;
+  if (el.id === 'tripSel') { S.tripId = el.value; lsSet('tw.trip', el.value); S.editOutfit = null; S.filter = 'all'; render(); window.scrollTo(0, 0); return; }
+  if (el.id === 'photoIn') { const files = [...el.files]; el.value = ''; if (files.length) { if (S.view !== 'wardrobe') location.hash = '#wardrobe'; photosJob(files); } return; }
+  if (el.id === 'f-photo') {
+    const file = el.files[0]; el.value = ''; if (!file || !S.assets) return;
+    const th = $('#f-thumb', dlg);
+    try {
+      th.style.opacity = '.5';
+      const blob = await shrink(file);
+      const up = await S.assets.upload(blob, { type: 'image/jpeg' });
+      if (S.dlgNew) dropPhoto(S.dlgNew);
+      S.dlgPhoto = up.id; S.dlgNew = up.id;
+      th.innerHTML = `<img src="${esc(up.url)}" alt="">`;
+    } catch (err) { toast(err?.message === 'decode' ? 'That photo format couldn’t be opened. Try a JPEG or PNG.' : assetErr(err), true); }
+    finally { th.style.opacity = ''; }
+    return;
+  }
+  const act = el.dataset?.act; const t = curTrip(); if (!act || !t) return;
+  const i = Number(el.dataset.i);
+  if (act === 'pack') { const k = el.dataset.k; updTrip(t.id, { packed: { [k]: el.checked } }); return; }
+  if (act === 'addToOutfit' && el.value) { const id = el.value; setOutfits(t, os => { if (os[i] && !(os[i].itemIds || []).includes(id)) os[i].itemIds = [...(os[i].itemIds || []), id]; }); return; }
+  if (act === 'outfitLabel') { const v = str(el.value, 60); setOutfits(t, os => { if (os[i]) os[i].label = v; }); return; }
+  if (act === 'outfitSlot') { const v = el.value; setOutfits(t, os => { if (os[i]) os[i].slot = v; }); return; }
+  if (act === 'outfitWho') { const v = el.value; setOutfits(t, os => { if (os[i]) os[i].who = v; }); return; }
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === 'tripForm') return saveTrip(f);
+  if (f.id === 'dayForm') return saveDay(f);
+  if (f.id === 'itemForm') return saveItem(f);
+  if (f.id === 'itinForm' || f.id === 'linksForm') {
+    const text = $('#f-text', f).value.trim(); if (!text) return dlgErr('Paste something first.');
+    closeDlg();
+    return f.id === 'itinForm' ? itineraryJob(text) : linksJob(text);
+  }
+  closeDlg();
+});
+document.addEventListener('error', e => { if (e.target?.tagName === 'IMG') e.target.classList.add('broken'); }, true);
+window.addEventListener('hashchange', () => { S.view = viewFromHash(); S.editOutfit = null; render(); window.scrollTo(0, 0); });
+const photoIn = $('#photoIn');
+photoIn.addEventListener('click', e => { if (S.job) { e.preventDefault(); toast('Claude is still working on the last request.'); } });
+
+boot();
+})();
+</script>
