@@ -1,6 +1,7 @@
 # Product plan
 
-> Status: draft, November 2026. Working name: Trip Wardrobe. First user: our honeymoon.
+> Status: draft, November 2026. Working name: Trip Wardrobe. Designed around our honeymoon; first used for real on
+> the trip after it.
 
 ## What we're building
 
@@ -9,8 +10,11 @@ trip. Each traveler sees what their passport needs for every country on the rout
 what you're doing, the weather, and what you'll wear, planned from the clothes you actually own. Before you leave, it
 tells you what's missing, what to buy, and what to pack, down to the plug adapter.
 
-We build it for our honeymoon first and use it for real on that trip. Then we widen it: cruises, ski trips, work
-travel, family trips, other people.
+We design it around our honeymoon. Then we widen it: cruises, ski trips, work travel, family trips, other people.
+
+The honeymoon starts less than two weeks after this plan was written. That is too soon to build, test and trust a
+new app, so the honeymoon runs on the prototype plus hand-done research, and its real confirmations, requirements
+and packing become the first test case for this app. The first trip that runs on the app itself is the next one.
 
 ## Product principles
 
@@ -25,9 +29,9 @@ travel, family trips, other people.
 5. **Works at the gate.** Trip details, confirmation numbers and boarding info open offline on a phone.
 6. **Useful without AI.** Everything can be entered by hand. AI saves time; it is never the only way in.
 
-## The honeymoon release
+## What the first release has to do
 
-What it has to do for our honeymoon, in the order we'll need it.
+What a trip like our honeymoon needs, in the order we'd need it.
 
 **While planning**
 
@@ -69,8 +73,13 @@ The full list with IDs is in [feature-map.md](feature-map.md).
 
 ## Phases
 
-The honeymoon date sets the timeline. Phase 1 has to be finished at least three weeks before departure, so we have
-time to actually use it for planning and packing.
+Two tracks run at once:
+
+- **The honeymoon (now).** The prototype handles the wardrobe, outfits and packing; entry requirements and
+  essentials are researched by hand. What we learn, what was painful and what we wished the app did, goes into
+  this plan.
+- **The app.** Phases 0 and 1 are built with the honeymoon as the test case. Real confirmations and documents are
+  used locally to test extraction and never committed; fixtures and evals stay fictional.
 
 ### Phase 0: Foundations
 
@@ -79,7 +88,7 @@ deployed to a private URL.
 
 Done when we can both sign in on our phones, create a trip and add each other.
 
-### Phase 1: The honeymoon release
+### Phase 1: First release
 
 Built in this order, each step usable on its own:
 
@@ -89,13 +98,13 @@ Built in this order, each step usable on its own:
 4. **Weather, wardrobe, outfits and packing.** The prototype, moved over, with real weather data.
 5. **Offline and installable.** Shared trip with both of us.
 
-Done when the whole honeymoon is in the app: every confirmation imported, requirements checked for both passports,
-outfits planned and the packing list ticked off.
+Done when the honeymoon can be rebuilt in the app from its real confirmations alone, with requirements, essentials,
+outfits and packing matching what we actually needed, and we'd trust it for the next trip.
 
 ### Phase 2: On the road
 
 Push notifications for flight changes (delay, gate, cancellation) and check-in windows. The "today" view. Calendar
-export. Read-only share links for family. We use it on the honeymoon and fix what hurts.
+export. Read-only share links for family. We use it on our next trip and fix what hurts.
 
 ### Phase 3: Beyond us
 
@@ -115,22 +124,21 @@ Some apps already cover parts of this:
 We haven't found one that joins them: bookings, entry requirements, weather and your own wardrobe in one plan per
 day, per traveler. That combination is the product.
 
-## What we need for the honeymoon
+## What we take from the honeymoon
 
-- Dates and the route: countries, cities, and any transit airports.
-- For each of us: nationalities (all passports you might travel on), country of residence, passport expiry dates.
-  No passport numbers.
-- Confirmation emails for flights, hotels, transfers, tours and restaurants. Keep them in one email folder or label,
-  so they're ready to forward when the inbox works.
-- Clothes: photos or product links. Collect them in a phone album for now.
-- Phones: iPhone or Android, for installing the app and getting notifications.
-- A domain name for the forwarding address. Any domain we own works.
+- The confirmation emails for flights, hotels, transfers, tours and restaurants, kept in one email folder. They are
+  the first real inputs for testing extraction, used locally and never committed.
+- The requirements and essentials we researched by hand, as the expected answers for the requirements and essentials
+  features.
+- What we actually wore and what we didn't, to judge the outfit planner.
+- Notes from the trip: what we looked up at the airport, what we couldn't find, what we wished the app did.
+- Phones (iPhone or Android) and a domain name for the forwarding address, for Phase 0 and Phase 1.
 
 ## Open decisions
 
-| Decision                       | Recommendation                                    | Why                                                                                                              |
-| ------------------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Web app or native app first    | Installable web app (PWA) first                   | One codebase, fastest to ship before the honeymoon, works on both phones. Native later if we need the App Store. |
-| Keep original emails and PDFs? | Keep until 30 days after the trip, then delete    | Useful at check-in and for re-reading. Extracted bookings stay.                                                  |
-| Paid services                  | Price each in its Phase 1 spike before committing | Flight data, inbound email, hosting and the Claude API all cost money; we choose with real numbers.              |
-| Product name and domain        | Decide before the forwarding address ships        | The forwarding address shows the domain.                                                                         |
+| Decision                       | Recommendation                                    | Why                                                                                                 |
+| ------------------------------ | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Web app or native app first    | Installable web app (PWA) first                   | One codebase, fastest to ship, works on both phones. Native later if we need the App Store.         |
+| Keep original emails and PDFs? | Keep until 30 days after the trip, then delete    | Useful at check-in and for re-reading. Extracted bookings stay.                                     |
+| Paid services                  | Price each in its Phase 1 spike before committing | Flight data, inbound email, hosting and the Claude API all cost money; we choose with real numbers. |
+| Product name and domain        | Decide before the forwarding address ships        | The forwarding address shows the domain.                                                            |
