@@ -12,9 +12,9 @@ tells you what's missing, what to buy, and what to pack, down to the plug adapte
 
 We design it around our honeymoon. Then we widen it: cruises, ski trips, work travel, family trips, other people.
 
-The honeymoon starts less than two weeks after this plan was written. That is too soon to build, test and trust a
-new app, so the honeymoon runs on the prototype plus hand-done research, and its real confirmations, requirements
-and packing become the first test case for this app. The first trip that runs on the app itself is the next one.
+The honeymoon starts less than two weeks after this plan was written. The full app can't be ready by then, so we
+ship a lean **honeymoon build** first: the real app, on both our phones, with the trip imported from the agent's
+itinerary link. Everything else in Phase 1 follows after the trip, with the honeymoon as its first test case.
 
 ## Product principles
 
@@ -73,13 +73,23 @@ The full list with IDs is in [feature-map.md](feature-map.md).
 
 ## Phases
 
-Two tracks run at once:
+### Honeymoon build (before departure)
 
-- **The honeymoon (now).** The prototype handles the wardrobe, outfits and packing; entry requirements and
-  essentials are researched by hand. What we learn, what was painful and what we wished the app did, goes into
-  this plan.
-- **The app.** Phases 0 and 1 are built with the honeymoon as the test case. Real confirmations and documents are
-  used locally to test extraction and never committed; fixtures and evals stay fictional.
+The smallest version we'd trust on the trip, built in this order:
+
+1. Expo app with the five tabs from the [information architecture](../design/information-architecture.md).
+2. Import a Travefy itinerary link on the phone (BKG-08): flights joined into one trip leg each, stays per night,
+   vouchers listed, gaps flagged (BKG-09).
+3. Itinerary, Day, Bookings and the flight pass, all offline (PLT-06).
+4. Ready: entry requirements per traveler from rules in `packages/core`, with sources and deadlines (REQ-02 to REQ-04).
+5. Pack: one checklist of documents, essentials and clothes, ticked state kept on the phone (PCK-01).
+6. On both phones through Expo (a development build or Expo Go with EAS Update).
+
+No server, sign-in, AI or email forwarding yet. The trip data lives only on the phones, imported from the link, so
+no real trip data enters the repository.
+
+After the trip, Phases 0 and 1 continue below, with the honeymoon as the first test case. Real confirmations and
+documents are used locally to test extraction and never committed; fixtures and evals stay fictional.
 
 ### Phase 0: Foundations
 
@@ -123,6 +133,23 @@ Some apps already cover parts of this:
 
 We haven't found one that joins them: bookings, entry requirements, weather and your own wardrobe in one plan per
 day, per traveler. That combination is the product.
+
+### What a travel agent's itinerary gets wrong
+
+Many trips, ours included, arrive as an agent's shared itinerary (Travefy is common). Reading one closely showed
+what we have to do better:
+
+- **A flight is split into pieces.** Departure and arrival are separate entries, often on different days, so a
+  connection is hard to see. We show one flight, with the layover between flights.
+- **Empty days disappear.** Days with nothing booked are left out, so you can't tell where you sleep each night.
+  We show every night and its stay.
+- **Gaps go unnoticed.** Nothing says there is no transfer from the airport to the first hotel. We flag it.
+- **Times have no time zone.** We show each time in the local time of its place, and say so.
+- **Vouchers are loose attachments.** We attach each PDF to its booking, available offline.
+- **Prices sit next to plans.** Useful when booking, noise on the trip. We keep them out of the trip view.
+- **Nothing about getting ready.** No entry requirements, weather, essentials or packing.
+
+So importing an agent's link is a first-release feature (BKG-08), and gap detection comes with it (BKG-09).
 
 ## What we take from the honeymoon
 

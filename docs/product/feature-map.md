@@ -41,6 +41,8 @@ us. Status is `planned`, `building` or `done`.
 | BKG-05 | Private forwarding address per user                                                               | 1     | planned |
 | BKG-06 | Open the original email or PDF from a booking                                                     | 1     | planned |
 | BKG-07 | Connect a mailbox (Gmail, Outlook) to find confirmations                                          | 3     | planned |
+| BKG-08 | Import a travel agent's shared itinerary link (Travefy first), vouchers included                  | 1     | planned |
+| BKG-09 | Flag gaps: no transfer between an arrival and the hotel, nights with no stay                      | 1     | planned |
 
 ## Flights (FLT)
 
