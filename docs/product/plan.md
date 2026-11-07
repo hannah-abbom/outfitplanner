@@ -96,7 +96,7 @@ Built in this order, each step usable on its own:
 2. **Forwarding address.** The same pipeline, fed by email.
 3. **Requirements, essentials and documents.**
 4. **Weather, wardrobe, outfits and packing.** The prototype, moved over, with real weather data.
-5. **Offline and installable.** Shared trip with both of us.
+5. **Offline on the phone.** Shared trip with both of us.
 
 Done when the honeymoon can be rebuilt in the app from its real confirmations alone, with requirements, essentials,
 outfits and packing matching what we actually needed, and we'd trust it for the next trip.
@@ -138,7 +138,7 @@ day, per traveler. That combination is the product.
 
 | Decision                       | Recommendation                                    | Why                                                                                                 |
 | ------------------------------ | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Web app or native app first    | Installable web app (PWA) first                   | One codebase, fastest to ship, works on both phones. Native later if we need the App Store.         |
+| Web app or native app first    | Decided: React Native with Expo, mobile first     | A real app on both phones, offline and with notifications; web can follow from the same code.       |
 | Keep original emails and PDFs? | Keep until 30 days after the trip, then delete    | Useful at check-in and for re-reading. Extracted bookings stay.                                     |
 | Paid services                  | Price each in its Phase 1 spike before committing | Flight data, inbound email, hosting and the Claude API all cost money; we choose with real numbers. |
 | Product name and domain        | Decide before the forwarding address ships        | The forwarding address shows the domain.                                                            |

@@ -6,16 +6,16 @@ us. Status is `planned`, `building` or `done`.
 
 ## Platform (PLT)
 
-| ID     | Feature                                                         | Phase | Status  |
-| ------ | --------------------------------------------------------------- | ----- | ------- |
-| PLT-01 | Monorepo, CI, lint, type-check, tests, preview deploys          | 0     | planned |
-| PLT-02 | Design tokens and primitives, carried over from the prototype   | 0     | planned |
-| PLT-03 | Sign-in (email link, Google, passkeys) and profiles             | 0     | planned |
-| PLT-04 | Fictional demo trip, shown without an account and used by tests | 0     | planned |
-| PLT-05 | Background jobs with retries and schedules                      | 1     | planned |
-| PLT-06 | Installable app with the trip available offline                 | 1     | planned |
-| PLT-07 | Per-user AI cost tracking and limits                            | 3     | planned |
-| PLT-08 | Native app decision and wrapper                                 | 3     | planned |
+| ID     | Feature                                                          | Phase | Status  |
+| ------ | ---------------------------------------------------------------- | ----- | ------- |
+| PLT-01 | Monorepo, CI, lint, type-check, tests, app builds for our phones | 0     | planned |
+| PLT-02 | Design tokens and primitives, carried over from the prototype    | 0     | planned |
+| PLT-03 | Sign-in (email link, Google, passkeys) and profiles              | 0     | planned |
+| PLT-04 | Fictional demo trip, shown without an account and used by tests  | 0     | planned |
+| PLT-05 | Background jobs with retries and schedules                       | 1     | planned |
+| PLT-06 | Trip, bookings and documents available offline on the phone      | 1     | planned |
+| PLT-07 | Per-user AI cost tracking and limits                             | 3     | planned |
+| PLT-08 | Native app decision and wrapper                                  | 3     | planned |
 
 ## Trips and timeline (TRP)
 

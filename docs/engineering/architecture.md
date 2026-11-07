@@ -28,7 +28,8 @@
 
 ```
 apps/
-  web/          Next.js App Router: pages, server actions, inbound webhooks, PWA, Playwright smoke tests
+  mobile/       Expo (React Native) app with Expo Router: screens, offline store, notifications, Maestro flows
+  api/          HTTP API for the app: auth, trips, bookings, uploads, AI tasks, inbound email webhooks, jobs
 packages/
   core/         Domain model (Zod), timeline building, booking merge rules, requirement rules, essentials rules,
                 packing derivation, time-zone helpers. Pure TypeScript, no I/O.
@@ -44,25 +45,28 @@ docs/           product/ engineering/ decisions/
 
 ## Stack
 
-| Concern       | Choice                                                                                        | Status   |
-| ------------- | --------------------------------------------------------------------------------------------- | -------- |
-| Language      | TypeScript, strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`                  | decided  |
-| Monorepo      | pnpm workspaces + Turborepo                                                                   | decided  |
-| Web           | Next.js App Router, React 19, server actions; mobile-first, installable (PWA)                 | decided  |
-| UI            | Tailwind CSS v4 on our own tokens, carried over from the prototype                            | decided  |
-| Contracts     | Zod 4                                                                                         | decided  |
-| Data          | Drizzle ORM; PGlite locally and in tests, managed Postgres in production (Neon)               | proposed |
-| Auth          | Better Auth in our own database: email link, Google, passkeys                                 | proposed |
-| Files         | S3-compatible object storage (Cloudflare R2 or Vercel Blob), private, encrypted at rest       | proposed |
-| Jobs          | Inngest for email processing, scheduled weather and flight refreshes, re-checks               | proposed |
-| AI            | Anthropic TypeScript SDK behind a gateway (see below)                                         | decided  |
-| Inbound email | Postmark Inbound, posting parsed email to a webhook                                           | spike    |
-| Flight status | AeroDataBox on demand in Phase 1; an alerts-capable provider (FlightAware AeroAPI) in Phase 2 | spike    |
-| Weather       | Open-Meteo: forecast, historical archive for climate averages, geocoding                      | proposed |
-| Push          | Web Push with VAPID keys (on iPhone, works once the app is installed to the home screen)      | phase 2  |
-| Hosting       | Vercel for the web app                                                                        | proposed |
-| Testing       | Vitest (unit, snapshot), Playwright (end to end), evals for AI tasks                          | decided  |
-| Quality gates | ESLint (typescript-eslint strict), Prettier, type-check, tests, build, smoke tests in CI      | decided  |
+| Concern       | Choice                                                                                         | Status   |
+| ------------- | ---------------------------------------------------------------------------------------------- | -------- |
+| Language      | TypeScript, strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`                   | decided  |
+| Monorepo      | pnpm workspaces + Turborepo                                                                    | decided  |
+| Mobile        | React Native with Expo and Expo Router; iPhone and Android first, web later from the same code | decided  |
+| Offline       | Trips, bookings and documents cached on the device (SQLite and the file system)                | decided  |
+| API           | A TypeScript HTTP service (Hono) sharing Zod contracts with the app through `packages/core`    | proposed |
+| UI            | Our own primitives on design tokens in `packages/ui`; styling approach chosen in Phase 0       | decided  |
+| Contracts     | Zod 4                                                                                          | decided  |
+| Data          | Drizzle ORM; PGlite locally and in tests, managed Postgres in production (Neon)                | proposed |
+| Auth          | Better Auth in our own database: email link, Google, passkeys                                  | proposed |
+| Files         | S3-compatible object storage (Cloudflare R2 or Vercel Blob), private, encrypted at rest        | proposed |
+| Jobs          | Inngest for email processing, scheduled weather and flight refreshes, re-checks                | proposed |
+| AI            | Anthropic TypeScript SDK behind a gateway (see below)                                          | decided  |
+| Inbound email | Postmark Inbound, posting parsed email to a webhook                                            | spike    |
+| Flight status | AeroDataBox on demand in Phase 1; an alerts-capable provider (FlightAware AeroAPI) in Phase 2  | spike    |
+| Weather       | Open-Meteo: forecast, historical archive for climate averages, geocoding                       | proposed |
+| Push          | Expo Notifications (Apple and Google push through Expo's push service)                         | phase 2  |
+| Builds        | EAS Build and EAS Update; TestFlight and Android internal testing for us two                   | proposed |
+| Hosting       | The API on a managed Node host (Vercel, Fly or Render), chosen in Phase 0                      | proposed |
+| Testing       | Vitest (unit, snapshot), Maestro (end-to-end flows on simulators), evals for AI tasks          | decided  |
+| Quality gates | ESLint (typescript-eslint strict), Prettier, type-check, tests, build, smoke tests in CI       | decided  |
 
 ## Data model
 
@@ -186,7 +190,7 @@ prototype's guessing from the URL. Outfit planning streams its progress to the p
 - Unit tests for everything in `packages/core`: time zones, merge rules, requirement rules, essentials rules,
   packing derivation.
 - Integration tests run against PGlite with fake integrations.
-- Playwright smoke tests cover the demo trip on a phone-sized viewport.
+- Maestro flows cover the demo trip on iPhone and Android simulators.
 - Evals for each AI task with fictional fixtures: booking emails across airlines, hotels and agencies, multi-leg
   itineraries, garment photos.
 - CI runs format, lint, type-check, tests, build and smoke tests on every pull request. Evals run on `main` when an
@@ -194,12 +198,12 @@ prototype's guessing from the URL. Outfit planning streams its progress to the p
 
 ## Environments and secrets
 
-| Variable                                | Used by                |
-| --------------------------------------- | ---------------------- |
-| `DATABASE_URL`                          | db (PGlite when unset) |
-| `ANTHROPIC_API_KEY`                     | ai                     |
-| `BETTER_AUTH_SECRET`, OAuth client ids  | auth                   |
-| `STORAGE_*`                             | files                  |
-| `INBOUND_WEBHOOK_SECRET`                | inbound email          |
-| `FLIGHT_STATUS_API_KEY`                 | flights                |
-| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | push (phase 2)         |
+| Variable                               | Used by                |
+| -------------------------------------- | ---------------------- |
+| `DATABASE_URL`                         | db (PGlite when unset) |
+| `ANTHROPIC_API_KEY`                    | ai                     |
+| `BETTER_AUTH_SECRET`, OAuth client ids | auth                   |
+| `STORAGE_*`                            | files                  |
+| `INBOUND_WEBHOOK_SECRET`               | inbound email          |
+| `FLIGHT_STATUS_API_KEY`                | flights                |
+| `EXPO_ACCESS_TOKEN`                    | builds, push (phase 2) |
