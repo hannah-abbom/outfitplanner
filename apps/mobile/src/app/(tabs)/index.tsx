@@ -14,6 +14,7 @@ import { Pressable, Text, View } from "react-native";
 import { Icon } from "@/components/icons";
 import { Body, Button, Card, Eyebrow, Mono, Muted, Screen, Strong, Title } from "@/components/ui";
 import { Fonts, Radius, Space, STOP_COLORS, usePalette } from "@/constants/theme";
+import { WeatherBadge } from "@/components/weather";
 import { dateBlock, nights, rangeLabel, todayIso } from "@/lib/format";
 import { sampleTrip } from "@/lib/import";
 import { useTrip } from "@/state/trip-store";
@@ -253,6 +254,7 @@ function DayCard({ day }: { day: TripDay }) {
           </View>
         ))}
       </View>
+      <WeatherBadge date={day.date} />
     </Card>
   );
 }

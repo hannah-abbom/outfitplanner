@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/icons";
-import { Body, Button, Card, Eyebrow, Muted, Title } from "@/components/ui";
+import { Body, Button, Card, Eyebrow, Muted, Segmented, Title } from "@/components/ui";
 import { Fonts, Radius, Space, usePalette } from "@/constants/theme";
 import { ImportError, importFromLink, sampleTrip } from "@/lib/import";
 import { useTrip } from "@/state/trip-store";
@@ -25,7 +25,7 @@ type Draft = { name: string; nationalities: string; passportExpiry: string };
 export default function AddScreen() {
   const c = usePalette();
   const insets = useSafeAreaInsets();
-  const { trip, setTrip, setTravelers } = useTrip();
+  const { trip, setTrip, setTravelers, unit, setUnit } = useTrip();
   const [link, setLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -215,6 +215,15 @@ export default function AddScreen() {
               <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.bad }}>{travelerError}</Text>
             )}
             <Button label="Save travelers" onPress={saveTravelers} />
+            <Eyebrow style={{ marginTop: Space.md }}>Temperatures</Eyebrow>
+            <Segmented
+              value={unit}
+              onChange={setUnit}
+              options={[
+                { value: "C", label: "Celsius" },
+                { value: "F", label: "Fahrenheit" },
+              ]}
+            />
             <Pressable
               accessibilityRole="button"
               onPress={() => {

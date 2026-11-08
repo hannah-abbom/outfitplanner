@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 
 import { usePalette } from "@/constants/theme";
+import { useWeatherSync } from "@/lib/weather";
 import { TripProvider, useTrip } from "@/state/trip-store";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -31,6 +32,7 @@ function Navigator() {
     IBMPlexMono_500Medium,
   });
   const loaded = ready && (fontsLoaded || fontError !== null);
+  useWeatherSync();
 
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync().catch(() => {});

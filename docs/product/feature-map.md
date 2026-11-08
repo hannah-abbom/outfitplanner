@@ -6,25 +6,25 @@ us. Status is `planned`, `building` or `done`.
 
 ## Platform (PLT)
 
-| ID     | Feature                                                          | Phase | Status  |
-| ------ | ---------------------------------------------------------------- | ----- | ------- |
-| PLT-01 | Monorepo, CI, lint, type-check, tests, app builds for our phones | 0     | planned |
-| PLT-02 | Design tokens and primitives, carried over from the prototype    | 0     | planned |
-| PLT-03 | Sign-in (email link, Google, passkeys) and profiles              | 0     | planned |
-| PLT-04 | Fictional demo trip, shown without an account and used by tests  | 0     | planned |
-| PLT-05 | Background jobs with retries and schedules                       | 1     | planned |
-| PLT-06 | Trip, bookings and documents available offline on the phone      | 1     | planned |
-| PLT-07 | Per-user AI cost tracking and limits                             | 3     | planned |
-| PLT-08 | Native app decision and wrapper                                  | 3     | planned |
+| ID     | Feature                                                          | Phase | Status   |
+| ------ | ---------------------------------------------------------------- | ----- | -------- |
+| PLT-01 | Monorepo, CI, lint, type-check, tests, app builds for our phones | 0     | building |
+| PLT-02 | Design tokens and primitives, carried over from the prototype    | 0     | done     |
+| PLT-03 | Sign-in (email link, Google, passkeys) and profiles              | 0     | planned  |
+| PLT-04 | Fictional demo trip, shown without an account and used by tests  | 0     | planned  |
+| PLT-05 | Background jobs with retries and schedules                       | 1     | planned  |
+| PLT-06 | Trip, bookings and documents available offline on the phone      | 1     | done     |
+| PLT-07 | Per-user AI cost tracking and limits                             | 3     | planned  |
+| PLT-08 | Native app decision and wrapper                                  | 3     | planned  |
 
 ## Trips and timeline (TRP)
 
 | ID     | Feature                                                                                    | Phase | Status  |
 | ------ | ------------------------------------------------------------------------------------------ | ----- | ------- |
-| TRP-01 | Multiple trips with name, kind, dates and cover                                            | 0     | planned |
-| TRP-02 | Travelers per trip with nationalities, residence and passport expiry (no passport numbers) | 0     | planned |
-| TRP-03 | Stops and nights, built from bookings or entered by hand                                   | 1     | planned |
-| TRP-04 | Days with plans, dress codes and linked bookings                                           | 1     | planned |
+| TRP-01 | Multiple trips with name, kind, dates and cover                                            | 0     | done    |
+| TRP-02 | Travelers per trip with nationalities, residence and passport expiry (no passport numbers) | 0     | done    |
+| TRP-03 | Stops and nights, built from bookings or entered by hand                                   | 1     | done    |
+| TRP-04 | Days with plans, dress codes and linked bookings                                           | 1     | done    |
 | TRP-05 | Paste a free-text itinerary and get days and plans                                         | 1     | planned |
 | TRP-06 | "Today" view: what's next, confirmation numbers, weather, outfit                           | 2     | planned |
 | TRP-07 | Calendar export (.ics)                                                                     | 2     | planned |
@@ -41,14 +41,14 @@ us. Status is `planned`, `building` or `done`.
 | BKG-05 | Private forwarding address per user                                                               | 1     | planned |
 | BKG-06 | Open the original email or PDF from a booking                                                     | 1     | planned |
 | BKG-07 | Connect a mailbox (Gmail, Outlook) to find confirmations                                          | 3     | planned |
-| BKG-08 | Import a travel agent's shared itinerary link (Travefy first), vouchers included                  | 1     | planned |
-| BKG-09 | Flag gaps: no transfer between an arrival and the hotel, nights with no stay                      | 1     | planned |
+| BKG-08 | Import a travel agent's shared itinerary link (Travefy first), vouchers included                  | 1     | done    |
+| BKG-09 | Flag gaps: no transfer between an arrival and the hotel, nights with no stay                      | 1     | done    |
 
 ## Flights (FLT)
 
 | ID     | Feature                                                                         | Phase | Status  |
 | ------ | ------------------------------------------------------------------------------- | ----- | ------- |
-| FLT-01 | Flight segments with airports, local times, terminals, seats and record locator | 1     | planned |
+| FLT-01 | Flight segments with airports, local times, terminals, seats and record locator | 1     | done    |
 | FLT-02 | Live status on demand                                                           | 1     | planned |
 | FLT-03 | Alerts for delays, gate changes and cancellations                               | 2     | planned |
 | FLT-04 | Check-in window reminders                                                       | 2     | planned |
@@ -57,18 +57,18 @@ us. Status is `planned`, `building` or `done`.
 
 | ID     | Feature                                                                                                                | Phase | Status  |
 | ------ | ---------------------------------------------------------------------------------------------------------------------- | ----- | ------- |
-| REQ-01 | Route countries, transits included, worked out from bookings                                                           | 1     | planned |
-| REQ-02 | Requirements per traveler and country: visa or travel authorization, passport validity, health, arrival forms, customs | 1     | planned |
-| REQ-03 | Every item carries an official source link and the date it was checked                                                 | 1     | planned |
-| REQ-04 | Deadlines turned into checklist items ("apply by …")                                                                   | 1     | planned |
+| REQ-01 | Route countries, transits included, worked out from bookings                                                           | 1     | done    |
+| REQ-02 | Requirements per traveler and country: visa or travel authorization, passport validity, health, arrival forms, customs | 1     | done    |
+| REQ-03 | Every item carries an official source link and the date it was checked                                                 | 1     | done    |
+| REQ-04 | Deadlines turned into checklist items ("apply by …")                                                                   | 1     | done    |
 | REQ-05 | Automatic re-check 30 and 7 days before departure, with changes flagged                                                | 2     | planned |
 
 ## Essentials and documents (ESS)
 
 | ID     | Feature                                                                              | Phase | Status  |
 | ------ | ------------------------------------------------------------------------------------ | ----- | ------- |
-| ESS-01 | Rule-based items from country data: plug adapters, voltage, currency, driving side   | 1     | planned |
-| ESS-02 | Documents checklist: passports, authorizations, insurance, tickets, vouchers         | 1     | planned |
+| ESS-01 | Rule-based items from country data: plug adapters, voltage, currency, driving side   | 1     | done    |
+| ESS-02 | Documents checklist: passports, authorizations, insurance, tickets, vouchers         | 1     | done    |
 | ESS-03 | Trip-specific suggestions from activities, weather and trip kind, each with a reason | 1     | planned |
 | ESS-04 | Your own standing list (the battery pack you always bring)                           | 1     | planned |
 
@@ -76,8 +76,8 @@ us. Status is `planned`, `building` or `done`.
 
 | ID    | Feature                                                  | Phase | Status  |
 | ----- | -------------------------------------------------------- | ----- | ------- |
-| WX-01 | Climate averages for far-off dates, from historical data | 1     | planned |
-| WX-02 | Forecast once the date is within range, refreshed daily  | 1     | planned |
+| WX-01 | Climate averages for far-off dates, from historical data | 1     | done    |
+| WX-02 | Forecast once the date is within range, refreshed daily  | 1     | done    |
 | WX-03 | Weather changes flagged against the outfit plan          | 2     | planned |
 
 ## Wardrobe (WRD)
@@ -101,7 +101,7 @@ us. Status is `planned`, `building` or `done`.
 
 | ID     | Feature                                                     | Phase | Status  |
 | ------ | ----------------------------------------------------------- | ----- | ------- |
-| PCK-01 | One checklist: clothes, essentials, documents, per traveler | 1     | planned |
+| PCK-01 | One checklist: clothes, essentials, documents, per traveler | 1     | done    |
 | PCK-02 | Packed state shared between travelers                       | 1     | planned |
 | PCK-03 | Luggage limits (carry-on only) shape the plan               | 1     | planned |
 

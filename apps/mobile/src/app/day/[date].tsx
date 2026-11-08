@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 
 import { BackHeader } from "@/components/back-header";
+import { WeatherCard } from "@/components/weather";
 import { Card, Eyebrow, Mono, Muted, Screen, Strong, Title } from "@/components/ui";
 import { Fonts, Space, usePalette } from "@/constants/theme";
 import { longDay } from "@/lib/format";
@@ -34,6 +35,7 @@ export default function DayScreen() {
         <Title>{longDay(day.date)}</Title>
         <Muted>{day.sleep ? `Tonight: ${day.sleep.name}` : "No bed tonight: you’re traveling"}</Muted>
       </View>
+      <WeatherCard date={day.date} />
       {day.items.length === 0 && <Muted>Nothing booked. A free day.</Muted>}
       <View>
         {day.items.map((item, i) => (

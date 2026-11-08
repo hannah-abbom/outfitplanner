@@ -14,7 +14,14 @@ export type IconName =
   | "check"
   | "file"
   | "close"
-  | "link";
+  | "link"
+  | "sun"
+  | "partly"
+  | "cloud"
+  | "fog"
+  | "rain"
+  | "storm"
+  | "snow";
 
 /** Stroke icons drawn on a 24-unit grid, colored by `color`. */
 export function Icon({
@@ -98,6 +105,44 @@ export function Icon({
         <>
           <Path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" {...p} />
           <Path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" {...p} />
+        </>
+      )}
+      {name === "sun" && (
+        <>
+          <Circle cx={12} cy={12} r={4.2} {...p} />
+          <Path
+            d="M12 2v2.2M12 19.8V22M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M2 12h2.2M19.8 12H22M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5"
+            {...p}
+          />
+        </>
+      )}
+      {name === "partly" && (
+        <>
+          <Path
+            d="M8 2.5v1.6M2.5 8h1.6M4.1 4.1l1.1 1.1M11.9 4.1l-1.1 1.1M5.3 10.6A3.4 3.4 0 0 1 11 6.4"
+            {...p}
+          />
+          <Path d="M17.5 12h-1A6 6 0 1 0 10 20h7.5a4 4 0 0 0 0-8z" {...p} />
+        </>
+      )}
+      {name === "cloud" && <Path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" {...p} />}
+      {name === "fog" && <Path d="M4 9h16M2 13h20M5 17h14" {...p} />}
+      {name === "rain" && (
+        <>
+          <Path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" {...p} />
+          <Path d="M8 13v6M12 15v6M16 13v6" {...p} />
+        </>
+      )}
+      {name === "storm" && (
+        <>
+          <Path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9" {...p} />
+          <Path d="M13 11l-4 6h6l-4 6" {...p} />
+        </>
+      )}
+      {name === "snow" && (
+        <>
+          <Path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25" {...p} />
+          <Path d="M8 16h.01M8 20h.01M12 18h.01M12 22h.01M16 16h.01M16 20h.01" {...p} />
         </>
       )}
     </Svg>

@@ -8,3 +8,19 @@ export * from "./essentials";
 export { buildDays, groupDays, daysUntil, type DayItem, type TripDay, type DayGroup } from "./days";
 /** A fictional itinerary for demos and tests. */
 export { travefyAzores as demoItinerary } from "./fixtures/travefy-azores";
+export {
+  FORECAST_DAYS,
+  ARCHIVE_YEARS,
+  weatherPlaces,
+  planWeatherRequests,
+  readForecast,
+  readTypical,
+  weatherKind,
+  weatherLabel,
+  clothingHints,
+  toFahrenheit,
+  type DayWeather,
+  type WeatherKind,
+  type WeatherPlace,
+  type WeatherRequest,
+} from "./weather";

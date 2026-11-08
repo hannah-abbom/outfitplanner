@@ -1,18 +1,29 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Trip, type Traveler } from "@trip/core";
+import { Trip, type DayWeather, type Traveler } from "@trip/core";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 /*
- * The trip and what's been ticked, kept on the phone only (PLT-06). Nothing is sent anywhere; the trip comes from
- * the agent's link and lives in AsyncStorage.
+ * The trip, what's been ticked and the weather, kept on the phone only (PLT-06). Nothing about the trip is sent
+ * anywhere; it comes from the agent's link and lives in AsyncStorage.
  */
 
 const KEY = "trip-wardrobe/v1";
+
+export type Unit = "C" | "F";
+
+export interface SavedWeather {
+  byDate: Record<string, DayWeather>;
+  fetchedAt: string;
+  /** The trip the weather was fetched for, so a new import fetches again. */
+  tripKey: string;
+}
 
 interface Saved {
   trip: Trip | null;
   done: Record<string, boolean>;
   packed: Record<string, boolean>;
+  weather: SavedWeather | null;
+  unit: Unit;
 }
 
 interface TripStore extends Saved {
@@ -21,17 +32,29 @@ interface TripStore extends Saved {
   setTravelers: (travelers: Traveler[]) => void;
   toggleDone: (id: string) => void;
   togglePacked: (id: string) => void;
+  setWeather: (weather: SavedWeather) => void;
+  setUnit: (unit: Unit) => void;
 }
 
-const empty: Saved = { trip: null, done: {}, packed: {} };
+const empty: Saved = { trip: null, done: {}, packed: {}, weather: null, unit: "C" };
 const Ctx = createContext<TripStore | null>(null);
+
+export function tripKey(trip: Trip): string {
+  return `${trip.source.importedAt}|${trip.start}|${trip.end}`;
+}
 
 function parseSaved(raw: string | null): Saved {
   if (!raw) return empty;
   try {
     const j = JSON.parse(raw) as Partial<Saved>;
     const trip = j.trip ? Trip.safeParse(j.trip) : null;
-    return { trip: trip?.success ? trip.data : null, done: j.done ?? {}, packed: j.packed ?? {} };
+    return {
+      trip: trip?.success ? trip.data : null,
+      done: j.done ?? {},
+      packed: j.packed ?? {},
+      weather: j.weather && typeof j.weather === "object" && "byDate" in j.weather ? j.weather : null,
+      unit: j.unit === "F" ? "F" : "C",
+    };
   } catch {
     return empty;
   }
@@ -60,10 +83,12 @@ export function TripProvider({ children }: { children: ReactNode }) {
     () => ({
       ...saved,
       ready,
-      setTrip: (trip) => update(() => ({ trip, done: {}, packed: {} })),
+      setTrip: (trip) => update((s) => ({ ...empty, unit: s.unit, trip })),
       setTravelers: (travelers) => update((s) => (s.trip ? { ...s, trip: { ...s.trip, travelers } } : s)),
       toggleDone: (id) => update((s) => ({ ...s, done: { ...s.done, [id]: !s.done[id] } })),
       togglePacked: (id) => update((s) => ({ ...s, packed: { ...s.packed, [id]: !s.packed[id] } })),
+      setWeather: (weather) => update((s) => ({ ...s, weather })),
+      setUnit: (unit) => update((s) => ({ ...s, unit })),
     }),
     [saved, ready, update],
   );
