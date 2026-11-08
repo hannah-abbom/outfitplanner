@@ -5,3 +5,6 @@ export * from "./travefy";
 export { journeys, countryVisits, addMonths, type Journey, type CountryVisit } from "./route";
 export * from "./requirements";
 export * from "./essentials";
+export { buildDays, groupDays, daysUntil, type DayItem, type TripDay, type DayGroup } from "./days";
+/** A fictional itinerary for demos and tests. */
+export { travefyAzores as demoItinerary } from "./fixtures/travefy-azores";

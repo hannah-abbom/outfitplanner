@@ -1,4 +1,5 @@
 .expo/
 .next/
+dist/
 pnpm-lock.yaml
 prototype/
