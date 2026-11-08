@@ -1,12 +1,15 @@
 import { router } from "expo-router";
 import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from "expo-router/ui";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Icon, type IconName } from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { Fonts, usePalette } from "@/constants/theme";
 
-/** The five places from the information architecture: Itinerary, Bookings, Add, Ready, Pack. */
+/**
+ * Home · Outfits · [+] · Closet · Trip. Outfits sits next to Home because planning what to wear is the point of
+ * the app; the plus adds clothes first, since the closet is what everything else is built from.
+ */
 export default function TabsLayout() {
   const c = usePalette();
   const insets = useSafeAreaInsets();
@@ -19,50 +22,56 @@ export default function TabsLayout() {
           left: 0,
           right: 0,
           bottom: 0,
-          paddingTop: 8,
-          paddingBottom: Math.max(insets.bottom, 10),
-          backgroundColor: c.surface,
-          borderTopWidth: 1,
+          paddingTop: 6,
+          paddingHorizontal: 12,
+          paddingBottom: Math.max(insets.bottom, 12),
+          backgroundColor: c.paper,
+          borderTopWidth: StyleSheet.hairlineWidth * 2,
           borderTopColor: c.line,
           flexDirection: "row",
-          alignItems: "flex-start",
+          alignItems: "center",
         }}
       >
         <TabTrigger name="index" href="/" asChild>
-          <TabButton icon="map" label="Itinerary" />
+          <TabButton label="Home" />
         </TabTrigger>
-        <TabTrigger name="bookings" href="/bookings" asChild>
-          <TabButton icon="ticket" label="Bookings" />
+        <TabTrigger name="outfits" href="/outfits" asChild>
+          <TabButton label="Outfits" />
         </TabTrigger>
         <AddButton />
-        <TabTrigger name="ready" href="/ready" asChild>
-          <TabButton icon="shield" label="Ready" />
+        <TabTrigger name="closet" href="/closet" asChild>
+          <TabButton label="Closet" />
         </TabTrigger>
-        <TabTrigger name="pack" href="/pack" asChild>
-          <TabButton icon="suitcase" label="Pack" />
+        <TabTrigger name="trip" href="/trip" asChild>
+          <TabButton label="Trip" />
         </TabTrigger>
       </TabList>
     </Tabs>
   );
 }
 
-function TabButton({
-  icon,
-  label,
-  isFocused,
-  ...props
-}: Omit<TabTriggerSlotProps, "ref"> & { icon: IconName; label: string }) {
+function TabButton({ label, isFocused, ...props }: Omit<TabTriggerSlotProps, "ref"> & { label: string }) {
   const c = usePalette();
-  const color = isFocused ? c.accent : c.muted;
   return (
     <Pressable
       {...props}
       accessibilityRole="tab"
       accessibilityState={{ selected: !!isFocused }}
-      style={{ flex: 1, alignItems: "center", gap: 4, minHeight: 48 }}
+      style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 48 }}
     >
-      <Icon name={icon} color={color} size={24} />
-      <Text style={{ fontFamily: Fonts.semibold, fontSize: 11, color }}>{label}</Text>
+      <View style={{ borderBottomWidth: 1.5, borderBottomColor: isFocused ? c.accent : "transparent", paddingBottom: 4 }}>
+        <Text
+          style={{
+            fontFamily: Fonts.medium,
+            fontSize: 10.5,
+            letterSpacing: 1.8,
+            textTransform: "uppercase",
+            color: isFocused ? c.ink : c.faint,
+          }}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -70,28 +79,22 @@ function TabButton({
 function AddButton() {
   const c = usePalette();
   return (
-    <View style={{ flex: 1, alignItems: "center" }}>
+    <View style={{ flex: 0.9, alignItems: "center" }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Add a booking or import a trip"
+        accessibilityLabel="Add clothes or a trip"
         onPress={() => router.push("/add")}
         style={({ pressed }) => ({
-          width: 56,
-          height: 56,
-          marginTop: -26,
-          borderRadius: 28,
+          width: 48,
+          height: 48,
+          borderRadius: 24,
           backgroundColor: c.accent,
           alignItems: "center",
           justifyContent: "center",
-          shadowColor: c.accent,
-          shadowOpacity: 0.35,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 6,
-          opacity: pressed ? 0.85 : 1,
+          opacity: pressed ? 0.8 : 1,
         })}
       >
-        <Icon name="plus" color={c.onAccent} size={26} strokeWidth={2.2} />
+        <Icon name="plus" color={c.onAccent} size={20} strokeWidth={1.6} />
       </Pressable>
     </View>
   );

@@ -1,71 +1,60 @@
 # Information architecture
 
-> Status: first exploration, November 2026. Where every feature lives in the mobile app, and why.
+> Status: second version, November 2026. The outfit planner is the main feature; everything else feeds it.
 
-## The rule that organizes everything
+## What the app is for
 
-A trip asks three questions, and each has one home:
+You give it a trip and your clothes, and it helps you decide what to wear each day and what to pack. The trip
+supplies the days, the weather and the plans; the closet supplies the pieces; the planner is where they meet. The
+packing list is whatever the looks use, plus the essentials and documents the route needs.
 
-| Question            | Home          | Holds                                                                                 |
-| ------------------- | ------------- | ------------------------------------------------------------------------------------- |
-| Where and when?     | **Itinerary** | Stops, nights, days, and everything that happens on a day, in local time              |
-| What did we book?   | **Bookings**  | Every reservation with its confirmation number, documents and contacts, offline       |
-| What must we do?    | **Ready**     | Entry requirements, forms and deadlines per traveler: things to _do_ before or during |
-| What must we bring? | **Pack**      | Outfits per day, clothes, essentials and documents: things to _bring_                 |
+Three questions, each with one home:
 
-"Do" and "bring" never mix. Applying for a travel authorization is in Ready; carrying the printed authorization is
-in Pack. The passport-validity check is in Ready; the passport itself is in Pack.
+| Question           | Home        | Holds                                                                   |
+| ------------------ | ----------- | ----------------------------------------------------------------------- |
+| What do I wear?    | **Outfits** | Every day with its weather and plans, a Day and an Evening look, and the suitcase they add up to |
+| What do I have?    | **Closet**  | Every piece, from photos, screenshots of things you bought, and links   |
+| Where, when, what? | **Trip**    | Days, bookings, and entry rules to _do_ before you go                   |
 
-A booking appears in two places by design: in Bookings as the record, and in Itinerary on the day it happens. It is
-the same object, so a change shows up in both.
+**Home** sits above them: every trip, the countdown to the next one, and one list of everything left across them.
 
 ## Navigation
 
 ```
-Trips (home)
-├── Trip ───────────────── bottom tabs: Itinerary · Bookings · [ + ] · Ready · Pack
-│   ├── Itinerary          route ribbon (stops and nights), days grouped by stop, Today when traveling
-│   │   └── Day            weather, timeline of the day's bookings and plans, what to wear
-│   │       └── Booking    (same detail screen as from Bookings)
-│   ├── Bookings           inbox of proposals to review, then all bookings by kind
-│   │   ├── Inbox item     what was found in an email or document, with the quotes it came from
-│   │   └── Booking        flight as a boarding pass; stays, transfers, activities, dining as cards
-│   ├── [ + ] Add          forward address, scan, upload, paste, enter by hand
-│   ├── Ready              readiness, traveler switcher, due-soon list, requirements by country
-│   │   └── Requirement    what it is, who it applies to, the deadline, the official source, last checked
-│   ├── Pack               Outfits | List
-│   │   ├── Outfits        per day and traveler, built from the wardrobe
-│   │   └── List           clothes, essentials, documents per traveler, with packed state shared
-│   └── Trip settings      (tap the trip name) travelers and sharing, dates, luggage, local info
-└── Profile                passports (nationality and expiry), home airport, wardrobe, my standing
-                           essentials, forwarding address, notifications
+Bottom tabs: Home · Outfits · [ + ] · Closet · Trip
+├── Home              next trip as a photo cover with the countdown; how many days have a look, with a way into
+│                     the planner; "Left to do" across trips (forms, missing transfers, days without a look,
+│                     pieces to get); every trip
+├── Outfits           the open trip, By day | Suitcase
+│   ├── By day        chapters (one per stay); each day: date, weather, plans, Day (or Travel) and Evening looks,
+│   │                 notes on what a look is missing; the closet tray along the bottom to drag from
+│   └── Suitcase      the looks' pieces once each with how often worn, then documents and essentials, with ticks
+├── [ + ] Add         to the closet: photos & screenshots, camera, link, type it in; trips: import an itinerary,
+│   │                 who's traveling
+│   └── Piece         photo or drawing, name (first guess fills the rest), what it is, colour, warmth, good
+│                     for, have it or to get, brand and link
+├── Closet            every piece in a grid, filtered by kind or "to get"; tap to edit
+└── Trip              the open trip, Days | Bookings | Ready, and its settings
+    ├── Days          chapters, then each day in local time with weather → Day
+    ├── Bookings      flights and stays by date, with missing transfers
+    ├── Ready         per traveler: what to do and by when, rules by country with official sources
+    └── Settings      import or re-import, rename the trip, travelers and passports, units, remove
+Day                   weather and what to wear, the day's looks, the timeline of bookings
+Flight                dark, readable at a glance: times, duration, time change, terminal, documents
+Stay                  dates, room, notes from the agent, missing transfer, vouchers
 ```
 
 ### Why these choices
 
-- **Trip first, not feature first.** Everything except Profile lives inside a trip, because people think "our
-  honeymoon", not "my bookings across trips". When a trip is under way or starts within a week, the app opens
-  straight into it.
-- **Add is always one tap away.** Getting bookings in is the job that makes everything else work, so it sits in
-  the middle of the tab bar on every trip screen.
-- **Itinerary becomes Today.** During the trip the same tab opens on today: what's next, the confirmation number
-  you'll be asked for, the weather and the outfit. No separate mode to switch into.
-- **Ready is per traveler.** Requirements depend on the passport. A couple with different passports sees each
-  person's list, plus what applies to both.
-- **Wardrobe belongs to the person.** Clothes carry over between trips, so the wardrobe lives in Profile and Pack
-  draws from it.
-
-## Screens in the first release
-
-| Screen     | Main job                               | Key content                                                           |
-| ---------- | -------------------------------------- | --------------------------------------------------------------------- |
-| Trips      | Get into the right trip                | Next trip with countdown and readiness, past trips, new trip          |
-| Itinerary  | See the shape of the trip              | Route ribbon, days grouped by stop, weather and key times per day     |
-| Day        | Know everything about one day          | Weather, timeline in local time, dress codes, outfit                  |
-| Bookings   | Find any reservation fast, offline     | Inbox count, filter by kind, confirmation numbers to copy             |
-| Booking    | Use it at the counter                  | Flight as a boarding pass; documents; contacts; source email          |
-| Add        | Get a booking in from anywhere         | Forward address with copy, scan, upload, paste, manual                |
-| Inbox item | Trust what was extracted               | Fields with the quote they came from, flags, confirm, edit or discard |
-| Ready      | Not miss anything that blocks the trip | Readiness, due-soon list sorted by deadline, requirements by country  |
-| Pack       | Leave with the right things            | Outfits per day; one list with progress per traveler                  |
-| Profile    | Set up once, reuse every trip          | Passports, wardrobe, standing essentials, forwarding address          |
+- **Outfits sits next to Home.** It's the reason to open the app, so it's one tap from anywhere and the first thing
+  Home points to after the countdown.
+- **The plus adds clothes first.** The closet is what the planner is built from; adding a trip comes second.
+- **The closet belongs to the person, not the trip.** Pieces carry over to the next trip; looks belong to a trip.
+- **Drag, or tap then tap.** Dragging from the tray onto a look is the quick way; tapping a piece and then a look
+  does the same for anyone who prefers not to drag.
+- **Plans shape looks.** A game drive asks for a layer and neutral colours, the beach for swim, dinner for something
+  dressy. The planner says what a look is missing, in plain words, in burgundy.
+- **Do, bring, wear never mix.** Ready is things to do (forms, clinics, passport checks). The suitcase is things to
+  bring. Outfits is what to wear.
+- **One accent.** Burgundy marks what needs you: the next thing to do, a missing transfer, a piece to get, the tab
+  you're on. Everything else is black and white, with photography doing the decorating.

@@ -1,81 +1,68 @@
 import { useColorScheme } from "react-native";
 
-/** Design tokens, carried over from the design canvas: passport burgundy, brass, boarding-pass mono. */
+/*
+ * Editorial: white paper, black ink, photography doing the decorating, and one accent. The accent is burgundy and
+ * marks what needs you: the next thing to do, a missing transfer, a piece you still have to buy, the selected tab.
+ */
 const light = {
-  paper: "#f5f3f6",
+  paper: "#ffffff",
   surface: "#ffffff",
-  sunk: "#ebe7ed",
-  ink: "#1d1a22",
-  muted: "#6b6371",
-  line: "#ddd6df",
-  accent: "#7b1e3f",
-  accentSoft: "#f4e4ea",
+  sunk: "#f3f2ef",
+  ink: "#111111",
+  muted: "#6b6b6b",
+  faint: "#9a9a9a",
+  line: "#e8e8e8",
+  accent: "#7a1f3d",
+  accentSoft: "#f6ebef",
   onAccent: "#ffffff",
-  brass: "#7a5612",
-  brassSoft: "#f5ecd7",
-  good: "#2e7d4f",
-  goodSoft: "#e2f1e7",
-  bad: "#8f1d17",
-  badSoft: "#fbe8e6",
-  warn: "#8a4b0b",
-  warnSoft: "#fdf3e7",
-  shadow: "rgba(29,26,34,0.12)",
-  /** The boarding pass keeps passport burgundy in both themes. */
-  pass: "#7b1e3f",
-  onPass: "#ffffff",
-  passRule: "rgba(255,255,255,0.45)",
+  /** Primary buttons are ink, so burgundy stays rare. */
+  button: "#111111",
+  onButton: "#ffffff",
+  scrim: "rgba(0,0,0,0.55)",
+  /** The flight screen is dark in both themes. */
+  pass: "#0b0b0b",
+  onPass: "#f4f3f0",
+  passMuted: "#8c8c8c",
+  passLine: "#262626",
 };
 
 const dark: typeof light = {
-  paper: "#141117",
-  surface: "#1d1922",
-  sunk: "#28232e",
-  ink: "#f1edf3",
-  muted: "#a79fad",
-  line: "#363040",
-  accent: "#e98fac",
-  accentSoft: "#3a2230",
-  onAccent: "#2a0d18",
-  brass: "#dcb460",
-  brassSoft: "#362d1b",
-  good: "#7fd09f",
-  goodSoft: "#1d3326",
-  bad: "#ff8f85",
-  badSoft: "#3d2221",
-  warn: "#f2b56b",
-  warnSoft: "#3a2a17",
-  shadow: "rgba(0,0,0,0.5)",
-  pass: "#6a1a37",
-  onPass: "#ffffff",
-  passRule: "rgba(255,255,255,0.4)",
+  paper: "#0b0b0b",
+  surface: "#141414",
+  sunk: "#1c1c1c",
+  ink: "#f4f3f0",
+  muted: "#a3a3a3",
+  faint: "#6e6e6e",
+  line: "#2a2a2a",
+  accent: "#e39ab0",
+  accentSoft: "#2e1820",
+  onAccent: "#1a0710",
+  button: "#f4f3f0",
+  onButton: "#0b0b0b",
+  scrim: "rgba(0,0,0,0.6)",
+  pass: "#000000",
+  onPass: "#f4f3f0",
+  passMuted: "#8c8c8c",
+  passLine: "#262626",
 };
 
 export type Palette = typeof light;
-
-/** Colors for each stay on the route ribbon; mid tones that read on both themes. */
-export const STOP_COLORS = [
-  "#9b2c52",
-  "#3a6ea5",
-  "#a07a2c",
-  "#8a8290",
-  "#1f7f7a",
-  "#6b5aa5",
-  "#b35f2b",
-] as const;
 
 export function usePalette(): Palette {
   return useColorScheme() === "dark" ? dark : light;
 }
 
 export const Fonts = {
-  display: "Gloock_400Regular",
-  body: "HankenGrotesk_400Regular",
-  medium: "HankenGrotesk_500Medium",
-  semibold: "HankenGrotesk_600SemiBold",
-  bold: "HankenGrotesk_700Bold",
-  mono: "IBMPlexMono_400Regular",
-  monoMedium: "IBMPlexMono_500Medium",
+  /** Bodoni Moda italic: titles, place names, the names of looks. */
+  serif: "BodoniModa_400Regular_Italic",
+  serifUpright: "BodoniModa_400Regular",
+  light: "Geist_300Light",
+  body: "Geist_400Regular",
+  medium: "Geist_500Medium",
+  semibold: "Geist_600SemiBold",
+  mono: "GeistMono_400Regular",
+  monoMedium: "GeistMono_500Medium",
 } as const;
 
-export const Space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 28 } as const;
-export const Radius = { sm: 10, md: 14, lg: 18, pill: 999 } as const;
+export const Space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
+export const Radius = { sm: 4, md: 8, lg: 14, pill: 999 } as const;

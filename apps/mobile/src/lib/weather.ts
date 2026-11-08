@@ -9,9 +9,10 @@ import {
 import { useEffect, useRef } from "react";
 
 import { todayIso } from "@/lib/format";
-import { tripKey, useTrip, type Unit } from "@/state/trip-store";
+import { tripKey, useStore, type Unit } from "@/state/trip-store";
 
 const REFRESH_MS = 6 * 60 * 60 * 1000;
+const RETRY_MS = 10 * 60 * 1000;
 const wait = (ms: number) => new Promise((ok) => setTimeout(ok, ms));
 
 /**
@@ -41,29 +42,36 @@ export async function fetchTripWeather(trip: Trip, today: string): Promise<Recor
   return byDate;
 }
 
-/** Keeps the saved weather fresh: fetches after an import, and again when it's more than six hours old. */
+/**
+ * Keeps the open trip's weather fresh: fetches after an import, and again when it's more than six hours old. A
+ * failed attempt waits ten minutes before the next, so editing looks doesn't hammer the weather service.
+ */
 export function useWeatherSync() {
-  const { trip, weather, setWeather } = useTrip();
+  const { active, updateTrip } = useStore();
   const running = useRef(false);
+  const lastTry = useRef<Record<string, number>>({});
   useEffect(() => {
-    if (!trip || running.current) return;
+    if (!active || running.current) return;
+    const { id, trip, weather } = active;
     const key = tripKey(trip);
-    const fresh =
-      weather && weather.tripKey === key && Date.now() - Date.parse(weather.fetchedAt) < REFRESH_MS;
-    if (fresh) return;
+    const fresh = weather && weather.tripKey === key && Date.now() - Date.parse(weather.fetchedAt) < REFRESH_MS;
+    if (fresh || Date.now() - (lastTry.current[key] ?? 0) < RETRY_MS) return;
     running.current = true;
+    lastTry.current[key] = Date.now();
     fetchTripWeather(trip, todayIso())
-      .then((byDate) => {
-        // Keep earlier days we already had when a refresh comes back partial.
-        const merged = weather?.tripKey === key ? { ...weather.byDate, ...byDate } : byDate;
-        if (Object.keys(merged).length)
-          setWeather({ byDate: merged, fetchedAt: new Date().toISOString(), tripKey: key });
-      })
+      .then((byDate) =>
+        updateTrip(id, (t) => {
+          // Keep earlier days we already had when a refresh comes back partial.
+          const merged = t.weather?.tripKey === key ? { ...t.weather.byDate, ...byDate } : byDate;
+          if (!Object.keys(merged).length) return t;
+          return { ...t, weather: { byDate: merged, fetchedAt: new Date().toISOString(), tripKey: key } };
+        }),
+      )
       .catch(() => {})
       .finally(() => {
         running.current = false;
       });
-  }, [trip, weather, setWeather]);
+  }, [active, updateTrip]);
 }
 
 export function temp(c: number, unit: Unit): string {

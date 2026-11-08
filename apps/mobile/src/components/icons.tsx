@@ -21,7 +21,11 @@ export type IconName =
   | "fog"
   | "rain"
   | "storm"
-  | "snow";
+  | "snow"
+  | "camera"
+  | "image"
+  | "trash"
+  | "hanger";
 
 /** Stroke icons drawn on a 24-unit grid, colored by `color`. */
 export function Icon({
@@ -138,6 +142,23 @@ export function Icon({
           <Path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9" {...p} />
           <Path d="M13 11l-4 6h6l-4 6" {...p} />
         </>
+      )}
+      {name === "camera" && (
+        <>
+          <Path d="M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" {...p} />
+          <Circle cx={12} cy={13} r={3.6} {...p} />
+        </>
+      )}
+      {name === "image" && (
+        <>
+          <Rect x={3} y={4} width={18} height={16} rx={2} {...p} />
+          <Circle cx={9} cy={9.5} r={1.6} {...p} />
+          <Path d="M21 16l-5-5-9 9" {...p} />
+        </>
+      )}
+      {name === "trash" && <Path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" {...p} />}
+      {name === "hanger" && (
+        <Path d="M12 7.5a2 2 0 1 1 2-2c0 1.2-2 1.6-2 3v1L2.8 15.6c-.9.6-.5 1.9.6 1.9h17.2c1.1 0 1.5-1.3.6-1.9L12 9.5" {...p} />
       )}
       {name === "snow" && (
         <>

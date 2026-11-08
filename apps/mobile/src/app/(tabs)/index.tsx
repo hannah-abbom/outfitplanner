@@ -1,260 +1,244 @@
-import {
-  buildDays,
-  daysUntil,
-  dueSoon,
-  groupDays,
-  requirementsFor,
-  type DayItem,
-  type TripDay,
-} from "@trip/core";
+import { buildDays, daysUntil, isDressed, piecesOf, whatsLeft, type LeftItem } from "@trip/core";
+import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/icons";
-import { Body, Button, Card, Eyebrow, Mono, Muted, Screen, Strong, Title } from "@/components/ui";
-import { Fonts, Radius, Space, STOP_COLORS, usePalette } from "@/constants/theme";
-import { WeatherBadge } from "@/components/weather";
-import { dateBlock, nights, rangeLabel, todayIso } from "@/lib/format";
+import { PieceThumb } from "@/components/piece";
+import { Scrim } from "@/components/scrim";
+import { Body, Button, Eyebrow, Muted, Row, Rule, Screen, SectionHeader, Serif, Title } from "@/components/ui";
+import { Fonts, Space, usePalette } from "@/constants/theme";
+import { dayLabel, nights, rangeLabel, todayIso, todayLong } from "@/lib/format";
 import { sampleTrip } from "@/lib/import";
-import { useTrip } from "@/state/trip-store";
+import { sampleCloset } from "@/lib/sample";
+import { useStore, type TripState } from "@/state/trip-store";
 
-export default function ItineraryScreen() {
-  const { trip, done, setTrip } = useTrip();
+const LEFT_SHOWN = 5;
+
+/** Every trip, the next one up front, and everything still to sort out across them. */
+export default function HomeScreen() {
   const c = usePalette();
+  const s = useStore();
+  const today = todayIso();
+  const [allLeft, setAllLeft] = useState(false);
 
-  const view = useMemo(() => {
-    if (!trip) return null;
-    const days = buildDays(trip);
-    // One line per task, even when it applies to both travelers.
-    const seen = new Set<string>();
-    const due = dueSoon(requirementsFor(trip))
-      .filter((r) => !done[r.id])
-      .filter((r) => {
-        const key = r.id.slice(r.traveler.length + 1);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    return { days, groups: groupDays(days), due, countdown: daysUntil(trip, todayIso()) };
-  }, [trip, done]);
+  const upcoming = useMemo(
+    () => s.trips.filter((t) => t.trip.end >= today).sort((a, b) => a.trip.start.localeCompare(b.trip.start)),
+    [s.trips, today],
+  );
+  const past = s.trips.filter((t) => t.trip.end < today);
+  const hero = (s.active && s.active.trip.end >= today ? s.active : null) ?? upcoming[0] ?? s.active ?? null;
 
-  if (!trip || !view) {
+  const left = useMemo(
+    () =>
+      upcoming.flatMap((t) =>
+        whatsLeft({ trip: t.trip, done: t.done, looks: t.looks }, s.closet, today).map((item) => ({ t, item })),
+      ),
+    [upcoming, s.closet, today],
+  );
+
+  if (!hero) {
     return (
       <Screen>
-        <Eyebrow>Trip Wardrobe</Eyebrow>
-        <Title>Your whole trip, in one place</Title>
+        <Eyebrow>{todayLong()}</Eyebrow>
+        <Title>Dress every day of the trip</Title>
         <Body style={{ color: c.muted }}>
-          Paste your travel agent’s itinerary link. We lay out every flight and night, check what each
-          passport needs, and build your packing list.
+          Import your travel agent’s itinerary and we lay out every day with its weather and plans. Add your clothes, drag
+          them onto each day, and the packing list writes itself.
         </Body>
         <View style={{ gap: Space.sm, marginTop: Space.md }}>
-          <Button label="Import my itinerary" onPress={() => router.push("/add")} />
+          <Button label="Import my itinerary" onPress={() => router.push("/trip-settings")} />
           <Button
             label="Look around with a sample trip"
             kind="secondary"
-            onPress={() => setTrip(sampleTrip())}
+            onPress={() => {
+              s.addTrip(sampleTrip());
+              if (s.closet.length === 0) sampleCloset().forEach(s.savePiece);
+            }}
           />
         </View>
       </Screen>
     );
   }
 
-  const stays = trip.stays;
-  const firstDue = view.due[0];
+  const open = (t: TripState, path: "/outfits" | "/closet" | "/trip", params?: Record<string, string>) => {
+    s.setActive(t.id);
+    router.push(params ? { pathname: path, params } : path);
+  };
+
   return (
-    <Screen>
-      <View style={{ gap: 6 }}>
-        <Eyebrow>{rangeLabel(trip.start, trip.end)}</Eyebrow>
-        <Title>{trip.name}</Title>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: Space.sm, flexWrap: "wrap" }}>
-          <Muted>
-            {trip.travelers.length ? trip.travelers.map((t) => t.name).join(" & ") : "Add who’s traveling"} ·{" "}
-            {nights(stays.reduce((n, s) => n + s.nights, 0))}
-          </Muted>
-          {view.countdown > 0 && (
-            <View
-              style={{
-                backgroundColor: c.accentSoft,
-                borderRadius: Radius.pill,
-                paddingHorizontal: 9,
-                paddingVertical: 3,
-              }}
-            >
-              <Text style={{ fontFamily: Fonts.monoMedium, fontSize: 12, color: c.accent }}>
-                {view.countdown} day{view.countdown === 1 ? "" : "s"} to go
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
+    <Screen hero={<Hero t={hero} onPress={() => open(hero, "/outfits")} />}>
+      <Eyebrow>{todayLong()}</Eyebrow>
+      <Outfits t={hero} onPlan={() => open(hero, "/outfits")} />
 
-      {stays.length > 0 && (
-        <Card style={{ gap: Space.sm }}>
-          <View style={{ flexDirection: "row", height: 10, borderRadius: 5, overflow: "hidden", gap: 3 }}>
-            {stays.map((s, i) => (
-              <View
-                key={s.id}
-                style={{ flex: Math.max(1, s.nights), backgroundColor: STOP_COLORS[i % STOP_COLORS.length] }}
-              />
-            ))}
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: Space.md, rowGap: 6 }}>
-            {stays.map((s, i) => (
-              <View
-                key={s.id}
-                style={{ flexDirection: "row", alignItems: "center", gap: 5, maxWidth: "100%" }}
-              >
-                <View
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: STOP_COLORS[i % STOP_COLORS.length],
-                  }}
-                />
-                <Text
-                  numberOfLines={1}
-                  style={{ fontFamily: Fonts.medium, fontSize: 12, color: c.ink, flexShrink: 1 }}
-                >
-                  {s.name}
-                </Text>
-                <Mono>{s.nights}n</Mono>
-              </View>
-            ))}
-          </View>
-        </Card>
-      )}
-
-      {trip.travelers.length === 0 ? (
-        <Banner
-          tone="bad"
-          title="Add who’s traveling"
-          detail="Entry rules depend on each passport."
-          onPress={() => router.push("/add")}
+      <SectionHeader title={left.length ? `Left to do · ${left.length}` : "Left to do"} />
+      <Rule strong />
+      {left.length === 0 && <Muted style={{ paddingVertical: Space.md }}>Nothing left. Enjoy the trip.</Muted>}
+      {(allLeft ? left : left.slice(0, LEFT_SHOWN)).map(({ t, item }, i, shown) => (
+        <LeftRow
+          key={`${t.id}:${item.id}`}
+          item={item}
+          tripName={upcoming.length > 1 ? t.trip.name : null}
+          last={i === shown.length - 1}
+          onPress={() => {
+            if (item.kind === "task") open(t, "/trip", { view: "ready" });
+            else if (item.kind === "gap") {
+              s.setActive(t.id);
+              router.push({ pathname: "/day/[date]", params: { date: item.gap.date } });
+            } else if (item.kind === "outfits") open(t, "/outfits");
+            else open(t, "/closet");
+          }}
         />
-      ) : (
-        firstDue && (
-          <Banner
-            tone={firstDue.status === "todo" ? "bad" : "soon"}
-            title={firstDue.title}
-            detail={
-              view.due.length > 1 ? `${view.due.length - 1} more to do before you go` : "Last thing to do"
-            }
-            onPress={() => router.push("/ready")}
-          />
-        )
+      ))}
+
+      {left.length > LEFT_SHOWN && (
+        <Pressable accessibilityRole="button" onPress={() => setAllLeft(!allLeft)} style={{ minHeight: 44, justifyContent: "center" }}>
+          <Eyebrow style={{ color: c.ink }}>{allLeft ? "Show fewer" : `Show all ${left.length}`}</Eyebrow>
+        </Pressable>
       )}
 
-      {view.groups.map((g) => {
-        const color = g.stay
-          ? STOP_COLORS[stays.findIndex((s) => s.id === g.stay?.id) % STOP_COLORS.length]
-          : c.muted;
+      <SectionHeader title="Your trips" action="Add" onAction={() => router.push("/trip-settings")} />
+      <Rule strong />
+      {[...upcoming, ...past].map((t, i, all) => {
+        const until = daysUntil(t.trip, today);
         return (
-          <View
-            key={`${g.stay?.id ?? "travel"}-${g.days[0]?.date}`}
-            style={{ gap: Space.sm, marginTop: Space.xs }}
-          >
-            <Eyebrow style={{ color }}>
-              {g.stay ? `${g.stay.name} · ${nights(g.stay.nights)}` : "On the way"}
+          <Row key={t.id} onPress={() => open(t, "/outfits")} last={i === all.length - 1} accessibilityLabel={`Open ${t.trip.name}`}>
+            <View style={{ flex: 1 }}>
+              <Serif size={19} numberOfLines={1}>
+                {t.trip.name}
+              </Serif>
+              <Muted>
+                {rangeLabel(t.trip.start, t.trip.end)} · {nights(t.trip.stays.reduce((n, x) => n + x.nights, 0))}
+              </Muted>
+            </View>
+            <Eyebrow style={{ color: t.id === hero.id ? c.accent : c.muted }}>
+              {t.trip.end < today ? "Past" : until > 0 ? `${until} days` : "Now"}
             </Eyebrow>
-            {g.days.map((d) => (
-              <DayCard key={d.date} day={d} />
-            ))}
-          </View>
+          </Row>
         );
       })}
     </Screen>
   );
 }
 
-function Banner({
-  tone,
-  title,
-  detail,
-  onPress,
-}: {
-  tone: "bad" | "soon";
-  title: string;
-  detail: string;
-  onPress: () => void;
-}) {
-  const c = usePalette();
-  const [bg, fg] = tone === "bad" ? [c.badSoft, c.bad] : [c.brassSoft, c.brass];
+function Hero({ t, onPress }: { t: TripState; onPress: () => void }) {
+  const insets = useSafeAreaInsets();
+  const until = daysUntil(t.trip, todayIso());
+  const names = t.trip.travelers.map((x) => x.name).join(" & ");
+  const label = until > 1 ? `${until} days to go` : until === 1 ? "Tomorrow" : until === 0 ? "Today" : "Under way";
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`${t.trip.name}, ${label}`}
       onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-        padding: 14,
-        borderRadius: Radius.md,
-        backgroundColor: bg,
-        opacity: pressed ? 0.8 : 1,
-      })}
+      style={{ height: 420 + insets.top, backgroundColor: "#2a2622", justifyContent: "flex-end" }}
     >
-      <Icon name="shield" color={fg} size={20} />
-      <Text style={{ flex: 1, fontFamily: Fonts.body, fontSize: 14, color: fg }}>
-        <Text style={{ fontFamily: Fonts.bold }}>{title}</Text> · {detail}
-      </Text>
-      <Icon name="chevronRight" color={fg} size={18} />
+      {t.trip.cover && (
+        <Image source={{ uri: t.trip.cover }} style={{ position: "absolute", inset: 0 }} contentFit="cover" transition={200} />
+      )}
+      <Scrim />
+      <View style={{ position: "absolute", top: insets.top + 18, left: Space.xl, right: Space.xl, flexDirection: "row", justifyContent: "space-between" }}>
+        <Eyebrow style={{ color: "#fff" }} numberOfLines={1}>
+          {names || "Your next trip"}
+        </Eyebrow>
+        <Eyebrow style={{ color: "#fff" }}>{label}</Eyebrow>
+      </View>
+      <View style={{ padding: Space.xl, gap: 10 }}>
+        <Eyebrow style={{ color: "rgba(255,255,255,0.85)" }}>{until > 0 ? "Next trip" : "This trip"}</Eyebrow>
+        <Text style={{ fontFamily: Fonts.serif, fontSize: 46, lineHeight: 48, letterSpacing: -0.5, color: "#fff" }} numberOfLines={3}>
+          {t.trip.name}
+        </Text>
+        <Text style={{ fontFamily: Fonts.light, fontSize: 13, letterSpacing: 0.3, color: "#fff" }}>
+          {rangeLabel(t.trip.start, t.trip.end)} · {nights(t.trip.stays.reduce((n, x) => n + x.nights, 0))} ·{" "}
+          {t.trip.stays.length} stays
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
-function itemLine(item: DayItem): { time: string | null; text: string; warn?: boolean } {
+/** The planner, front and centre: how far along the looks are, and a way in. */
+function Outfits({ t, onPlan }: { t: TripState; onPlan: () => void }) {
+  const c = usePalette();
+  const { closet } = useStore();
+  const days = buildDays(t.trip);
+  const dressed = days.filter((d) => isDressed(t.looks[d.date]));
+  const pct = days.length ? dressed.length / days.length : 0;
+  const pieces = [...new Map(dressed.flatMap((d) => [...piecesOf(t.looks[d.date]?.day, closet), ...piecesOf(t.looks[d.date]?.evening, closet)]).map((p) => [p.id, p])).values()].slice(0, 5);
+  const firstBare = days.find((d) => !isDressed(t.looks[d.date]));
+  return (
+    <View style={{ gap: Space.md, marginTop: Space.sm }}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" }}>
+        <Title style={{ fontSize: 34, lineHeight: 38 }}>The looks</Title>
+        <Text style={{ fontFamily: Fonts.light, fontSize: 28, letterSpacing: -0.6, color: c.ink }}>
+          {dressed.length}
+          <Text style={{ fontSize: 16, color: c.muted }}> / {days.length} days</Text>
+        </Text>
+      </View>
+      <View style={{ height: 2, backgroundColor: c.line }}>
+        <View style={{ width: `${pct * 100}%`, height: 2, backgroundColor: c.accent }} />
+      </View>
+      {pieces.length > 0 ? (
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          {pieces.map((p) => (
+            <PieceThumb key={p.id} item={p} width={56} />
+          ))}
+        </View>
+      ) : (
+        <Muted>
+          {closet.length
+            ? "Drag pieces from your closet onto each day, with the weather and plans in view."
+            : "Add your clothes, then drag them onto each day, with the weather and plans in view."}
+        </Muted>
+      )}
+      <Button label={firstBare ? `Plan from ${dayLabel(firstBare.date)}` : "See the looks"} onPress={onPlan} />
+    </View>
+  );
+}
+
+function leftText(item: LeftItem): { title: string; detail: string } {
   switch (item.kind) {
-    case "depart":
-      return {
-        time: item.time,
-        text: `${item.flight.from.code} → ${item.flight.to.code}${item.flight.flightNumber ? ` · ${item.flight.flightNumber}` : ""}`,
-      };
-    case "arrive":
-      return { time: item.time, text: `Land in ${item.flight.to.city ?? item.flight.to.code}` };
-    case "check-in":
-      return { time: null, text: `Check in at ${item.stay.name}` };
-    case "check-out":
-      return { time: null, text: `Check out of ${item.stay.name}` };
+    case "task": {
+      const when =
+        item.dueFrom && item.dueBy
+          ? `${dayLabel(item.dueFrom)} – ${dayLabel(item.dueBy)}`
+          : item.dueBy
+            ? `By ${dayLabel(item.dueBy)}`
+            : item.status === "check" ? "Check before you go" : "Before you go";
+      return { title: item.title, detail: `${when} · ${item.travelers.join(" & ")}` };
+    }
     case "gap":
       return item.gap.kind === "no-transfer"
-        ? { time: null, text: `No transfer booked to ${item.gap.stayName}`, warn: true }
-        : { time: null, text: "No place to stay booked tonight", warn: true };
+        ? { title: `No transfer from ${item.gap.airport}`, detail: `To ${item.gap.stayName} · ${dayLabel(item.gap.date)}` }
+        : { title: "No bed booked", detail: dayLabel(item.gap.date) };
+    case "outfits":
+      return {
+        title: `${item.days.length} day${item.days.length === 1 ? "" : "s"} without a look`,
+        detail: `Next: ${dayLabel(item.days[0] ?? "")}`,
+      };
+    case "buy":
+      return {
+        title: `${item.items.length} piece${item.items.length === 1 ? "" : "s"} to get`,
+        detail: item.items.map((i) => i.name).join(", "),
+      };
   }
 }
 
-function DayCard({ day }: { day: TripDay }) {
+function LeftRow({ item, tripName, last, onPress }: { item: LeftItem; tripName: string | null; last: boolean; onPress: () => void }) {
   const c = usePalette();
-  const block = dateBlock(day.date);
-  const lines = day.items.filter((i) => i.kind !== "check-out" || day.items.length === 1).map(itemLine);
+  const { title, detail } = leftText(item);
   return (
-    <Card
-      onPress={() => router.push({ pathname: "/day/[date]", params: { date: day.date } })}
-      style={{ flexDirection: "row", gap: Space.md }}
-    >
-      <View style={{ width: 44, alignItems: "center" }}>
-        <Mono style={{ fontSize: 11 }}>{block.weekday}</Mono>
-        <Text style={{ fontFamily: Fonts.display, fontSize: 26, lineHeight: 30, color: c.ink }}>
-          {block.day}
+    <Row onPress={onPress} last={last} accessibilityLabel={`${title}. ${detail}`}>
+      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: item.urgent ? c.accent : c.line }} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontFamily: Fonts.medium, fontSize: 15, color: item.urgent ? c.accent : c.ink }} numberOfLines={2}>
+          {title}
         </Text>
+        <Muted numberOfLines={2}>{tripName ? `${tripName} · ${detail}` : detail}</Muted>
       </View>
-      <View style={{ flex: 1, gap: 3, justifyContent: "center" }}>
-        {lines.length === 0 && <Muted>{day.sleep ? `At ${day.sleep.name}` : "Nothing booked"}</Muted>}
-        {lines.map((l, i) => (
-          <View key={i} style={{ flexDirection: "row", gap: 8 }}>
-            {l.time && <Mono style={{ paddingTop: 2 }}>{l.time}</Mono>}
-            {l.warn ? (
-              <Text style={{ flex: 1, fontFamily: Fonts.semibold, fontSize: 13, color: c.warn }}>
-                {l.text}
-              </Text>
-            ) : (
-              <Strong style={{ flex: 1, fontFamily: Fonts.body, fontSize: 14 }}>{l.text}</Strong>
-            )}
-          </View>
-        ))}
-      </View>
-      <WeatherBadge date={day.date} />
-    </Card>
+      <Icon name="chevronRight" color={c.faint} size={16} strokeWidth={1.4} />
+    </Row>
   );
 }

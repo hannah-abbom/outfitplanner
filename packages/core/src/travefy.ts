@@ -46,13 +46,23 @@ const TravefyIdea = z.object({
 
 export const TravefyItinerary = z.object({
   itineraryPage: z.object({
-    trip: z.object({ id: z.number().nullish(), name: z.string().nullish() }),
+    trip: z.object({
+      id: z.number().nullish(),
+      name: z.string().nullish(),
+      mediaImages: z.array(z.object({ url: z.string().nullish() })).nullish(),
+    }),
   }),
   tripDays: z.array(TravefyDay),
   tripEvents: z.array(TravefyEvent),
   tripIdeas: z.array(TravefyIdea).nullish(),
 });
 export type TravefyItinerary = z.infer<typeof TravefyItinerary>;
+
+/** The itinerary's cover photo, asked for at a size that fills a phone screen. */
+export function coverImage(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.replace(/\/img\/c_[^/]+\//, "/img/c_w1200,h1500,mFocusCover/");
+}
 
 /** The page id from a shared Travefy link, or null when the link isn't one we can read. */
 export function parseTravefyLink(link: string): string | null {
@@ -257,6 +267,7 @@ export function importTravefy(raw: unknown, options: ImportOptions = {}): Trip {
     stays,
     vouchers,
     gaps,
+    cover: coverImage(data.itineraryPage.trip.mediaImages?.[0]?.url),
     source: {
       kind: "travefy",
       url: options.link ?? null,

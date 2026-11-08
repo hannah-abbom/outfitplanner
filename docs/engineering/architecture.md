@@ -118,7 +118,10 @@ system prompt, its Zod output schema and its post-processing in code.
 | `garmentsFromPages`    | Product page title, description and image, fetched by us                                         | Clothing pieces                                            | low    |
 | `researchRequirements` | Traveler nationality, residence, country, dates; web search limited to official government sites | Requirement items, each with a source URL and quote        | high   |
 | `suggestEssentials`    | Trip kind, places, weather, plans, the rule-based list                                           | Extra items, each with a reason                            | medium |
-| `planOutfits`          | Days, weather, plans, wardrobe, luggage                                                          | Outfits per day and traveler, missing pieces, extras, tips | high   |
+| `planOutfits`          | Days, weather, plans, wardrobe, luggage, the trends brief                                        | Outfits per day and traveler, missing pieces, extras, tips | high   |
+| `trendsBrief`          | Season, destinations, the person's style words; web search                                       | A short brief of current trends with sources               | medium |
+| `findPieces`           | A missing piece and the brands the person names; web search limited to those brands' domains     | Products with name, link, image and price as found         | medium |
+| `readBoard`            | Pins from a Pinterest board the person connected (Pinterest API, boards and pins read access)     | Style words and the pieces the pins show                   | low    |
 
 ## Flows
 

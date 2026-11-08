@@ -5,10 +5,15 @@
 
 ## What we're building
 
-One place for everything about a trip. Forward a confirmation email and the flight, hotel or booking lands in the
-trip. Each traveler sees what their passport needs for every country on the route. Each day shows where you are,
-what you're doing, the weather, and what you'll wear, planned from the clothes you actually own. Before you leave, it
-tells you what's missing, what to buy, and what to pack, down to the plug adapter.
+An outfit planner for trips. You add the clothes you own, from photos, screenshots of things you bought, or links,
+and the app lays out every day of the trip with its weather and plans. You drag pieces onto each day's looks, it says
+what a look is missing (a layer for a cold evening, swim for the beach, neutrals for a game drive), and the packing
+list is whatever the looks use. AI suggests looks from your closet and current trends, and can find what's missing
+from brands you like.
+
+Around the planner sits everything else a trip needs, because the trip is what the looks are built on: the itinerary
+imported from the agent's link, bookings, what each passport needs for every country on the route, and one Home
+screen with every trip, the countdown and everything left to do.
 
 We design it around our honeymoon. Then we widen it: cruises, ski trips, work travel, family trips, other people.
 
@@ -77,19 +82,37 @@ The full list with IDs is in [feature-map.md](feature-map.md).
 
 The smallest version we'd trust on the trip, built in this order:
 
-1. Expo app with the five tabs from the [information architecture](../design/information-architecture.md).
+1. Expo app with the tabs from the [information architecture](../design/information-architecture.md): Home,
+   Outfits, Add, Closet, Trip.
 2. Import a Travefy itinerary link on the phone (BKG-08): flights joined into one trip leg each, stays per night,
    vouchers listed, gaps flagged (BKG-09).
 3. Itinerary, Day, Bookings and the flight pass, all offline (PLT-06).
 4. Ready: entry requirements per traveler from rules in `packages/core`, with sources and deadlines (REQ-02 to REQ-04).
-5. Pack: one checklist of documents, essentials and clothes, ticked state kept on the phone (PCK-01).
-6. On both phones through Expo (a development build or Expo Go with EAS Update).
+5. The closet: pieces from photos, screenshots and links, a first guess from each name (WRD-01 to WRD-04).
+6. The planner: every day with its weather and plans, Day and Evening looks filled by dragging or tapping, and notes
+   on what each look is missing (OUT-01 to OUT-04).
+7. The suitcase: the looks' pieces once each, plus documents and essentials, ticked on the phone (PCK-01, PCK-02).
+8. On both phones through Expo (a development build or Expo Go with EAS Update).
 
-No server, sign-in, AI or email forwarding yet. The trip data lives only on the phones, imported from the link, so
+No server, sign-in, AI or email forwarding yet. AI comes next, below. The trip data lives only on the phones, imported from the link, so
 no real trip data enters the repository.
 
 After the trip, Phases 0 and 1 continue below, with the honeymoon as the first test case. Real confirmations and
 documents are used locally to test extraction and never committed; fixtures and evals stay fictional.
+
+### The outfit planner's AI, next
+
+Each of these needs a small server, because the AI key can't live in the app. All are possible:
+
+- **Read photos and screenshots** (WRD-05): Claude looks at a photo or an order screenshot and returns each piece
+  with its kind, colour, warmth and style. A screenshot with four items becomes four pieces.
+- **Suggest looks with current trends** (OUT-05): Claude plans looks from the closet, each day's weather and plans,
+  and a short trends brief it builds with web search, then explains each pick. Suggestions land as drafts you keep
+  or drag away.
+- **Pinterest boards** (WRD-06): through Pinterest's official API, after you connect your account; it needs our app
+  approved by Pinterest. Until then, a pin's link or a screenshot of it works as inspiration.
+- **Find pieces from brands you name** (OUT-06, stretch): Claude searches the web limited to those brands' sites and
+  returns products with links and images. Prices and stock change, so results always open on the brand's own page.
 
 ### Phase 0: Foundations
 

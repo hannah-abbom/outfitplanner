@@ -32,7 +32,7 @@ export default function StayScreen() {
     <Screen tabs={false}>
       <BackHeader label="Back" />
       <View style={{ gap: 4 }}>
-        <Eyebrow style={{ color: c.brass }}>
+        <Eyebrow>
           {countryName(stay.country)} · {nights(stay.nights)}
         </Eyebrow>
         <Title>{stay.name}</Title>
@@ -60,9 +60,9 @@ export default function StayScreen() {
         </Card>
       )}
       {gap && (
-        <Card style={{ backgroundColor: c.warnSoft, borderColor: c.warn, borderStyle: "dashed" }}>
-          <Strong style={{ color: c.warn }}>No transfer booked</Strong>
-          <Body style={{ color: c.warn, fontSize: 13 }}>
+        <Card style={{ borderLeftWidth: 2, borderLeftColor: c.accent }}>
+          <Strong style={{ color: c.accent }}>No transfer booked</Strong>
+          <Body style={{ color: c.muted, fontSize: 13 }}>
             Nothing gets you from {gap.airport} airport to here yet. Ask the hotel or your agent.
           </Body>
         </Card>
@@ -76,7 +76,7 @@ export default function StayScreen() {
               onPress={v.url ? () => Linking.openURL(v.url as string) : undefined}
               style={{ flexDirection: "row", alignItems: "center", gap: Space.md }}
             >
-              <Icon name="file" color={c.accent} size={20} />
+              <Icon name="file" color={c.ink} size={20} strokeWidth={1.4} />
               <Strong style={{ flex: 1 }} numberOfLines={2}>
                 {v.name}
               </Strong>

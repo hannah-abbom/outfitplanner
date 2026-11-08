@@ -98,5 +98,7 @@ export const Trip = z.object({
   vouchers: z.array(Voucher),
   gaps: z.array(Gap),
   source: TripSource,
+  /** A photo for the trip, such as the cover image of the agent's itinerary. */
+  cover: z.string().nullish(),
 });
 export type Trip = z.infer<typeof Trip>;

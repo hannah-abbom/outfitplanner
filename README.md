@@ -32,6 +32,7 @@ Inside the app, tap **+** and paste a Travefy itinerary link, or choose the samp
 
 ## Layout
 
-- `apps/mobile`: the Expo app (Expo Router): Itinerary, Bookings, Add, Ready, Pack, and day, flight and stay screens
+- `apps/mobile`: the Expo app (Expo Router): Home, Outfits (the planner), Add, Closet, Trip, and day, flight, stay
+  and piece screens
 - `packages/core`: pure TypeScript with Zod: the Travefy importer, journeys and gaps, entry requirements with
   sources, essentials. Tests run on a fictional itinerary.

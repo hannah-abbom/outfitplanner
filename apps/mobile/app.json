@@ -26,6 +26,13 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose photos and screenshots of your clothes to add them to your closet.",
+          "cameraPermission": "Photograph your clothes to add them to your closet."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#7b1e3f",

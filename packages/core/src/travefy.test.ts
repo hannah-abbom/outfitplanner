@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { travefyAzores } from "./fixtures/travefy-azores";
-import { importTravefy, parseTravefyLink, travefyApiUrl, travefyTripIdFromHtml } from "./travefy";
+import { coverImage, importTravefy, parseTravefyLink, travefyApiUrl, travefyTripIdFromHtml } from "./travefy";
 
 const trip = importTravefy(travefyAzores, {
   link: "https://travefy.com/trip/itinerary/x",
@@ -104,5 +104,14 @@ describe("Travefy links", () => {
       '<meta name="x" content="{&quot;loadingModel&quot;:{&quot;itineraryPage&quot;:{&quot;trip&quot;:{&quot;id&quot;:4242,&quot;name&quot;:&quot;A &amp; B&quot;}}}}">';
     expect(travefyTripIdFromHtml(html)).toBe(4242);
     expect(travefyTripIdFromHtml("<html></html>")).toBeNull();
+  });
+});
+
+describe("coverImage", () => {
+  it("asks the image service for a phone-sized cover", () => {
+    expect(coverImage("https://images.example.com/img/c_w687,h270,mFocusCover/i_abc.jpg")).toBe(
+      "https://images.example.com/img/c_w1200,h1500,mFocusCover/i_abc.jpg",
+    );
+    expect(coverImage(null)).toBeNull();
   });
 });

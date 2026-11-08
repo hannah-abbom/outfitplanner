@@ -2,16 +2,15 @@ import { clothingHints, weatherKind, weatherLabel, type DayWeather } from "@trip
 import { Text, View } from "react-native";
 
 import { Icon } from "@/components/icons";
-import { Body, Card, Eyebrow, Muted, Tag } from "@/components/ui";
+import { Card, Eyebrow, Muted, Serif, Tag } from "@/components/ui";
 import { Fonts, Space, usePalette, type Palette } from "@/constants/theme";
 import { temp } from "@/lib/weather";
 import { useTrip } from "@/state/trip-store";
 
 function skyColor(w: DayWeather, c: Palette): string {
   const kind = weatherKind(w.code);
-  if (kind === "sun" || kind === "partly") return c.brass;
   if (kind === "rain" || kind === "storm") return c.accent;
-  return c.muted;
+  return c.ink;
 }
 
 /** Icon and high/low for a day card. Renders nothing until the weather has loaded. */
@@ -25,8 +24,8 @@ export function WeatherBadge({ date }: { date: string }) {
       style={{ alignItems: "flex-end", gap: 2, minWidth: 54 }}
       accessibilityLabel={`${weatherLabel(w.code)}, high ${temp(w.hi, unit)}, low ${temp(w.lo, unit)}`}
     >
-      <Icon name={weatherKind(w.code)} color={skyColor(w, c)} size={22} />
-      <Text style={{ fontFamily: Fonts.mono, fontSize: 12, color: c.ink }}>
+      <Icon name={weatherKind(w.code)} color={skyColor(w, c)} size={20} strokeWidth={1.3} />
+      <Text style={{ fontFamily: Fonts.light, fontSize: 14, color: c.ink }}>
         {temp(w.hi, unit)}
         <Text style={{ color: c.muted }}>/{temp(w.lo, unit)}</Text>
       </Text>
@@ -50,9 +49,9 @@ export function WeatherCard({ date }: { date: string }) {
   return (
     <Card style={{ gap: Space.sm }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: Space.md }}>
-        <Icon name={weatherKind(w.code)} color={skyColor(w, c)} size={40} strokeWidth={1.6} />
+        <Icon name={weatherKind(w.code)} color={skyColor(w, c)} size={36} strokeWidth={1.1} />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: Fonts.mono, fontSize: 22, color: c.ink }}>
+          <Text style={{ fontFamily: Fonts.light, fontSize: 30, letterSpacing: -0.6, color: c.ink }}>
             {temp(w.hi, unit)}
             <Text style={{ color: c.muted }}> / {temp(w.lo, unit)}</Text>
           </Text>
@@ -64,12 +63,12 @@ export function WeatherCard({ date }: { date: string }) {
         </View>
         <Tag tone={typical ? "check" : "accent"}>{typical ? "Typical" : "Forecast"}</Tag>
       </View>
-      <View style={{ gap: 4, paddingTop: Space.sm, borderTopWidth: 1, borderTopColor: c.sunk }}>
+      <View style={{ gap: 4, paddingTop: Space.sm, borderTopWidth: 1, borderTopColor: c.line }}>
         <Eyebrow>What to wear</Eyebrow>
         {clothingHints(w).map((h) => (
-          <Body key={h} style={{ fontSize: 14 }}>
+          <Serif key={h} size={17}>
             {h}
-          </Body>
+          </Serif>
         ))}
       </View>
       <Muted style={{ fontSize: 11.5 }}>

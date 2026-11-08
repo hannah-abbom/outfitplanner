@@ -4,6 +4,43 @@ Every feature has a stable ID. Reference IDs in commit messages and pull request
 Phases are defined in [plan.md](plan.md): **0** foundations, **1** honeymoon release, **2** on the road, **3** beyond
 us. Status is `planned`, `building` or `done`.
 
+The outfit planner is the heart of the app: the closet (WRD), the looks for each day (OUT) and the packing list they
+add up to (PCK). Everything else feeds it: the trip gives the days, the weather and the plans; bookings and entry rules
+keep the rest of the trip in hand.
+
+## Closet (WRD)
+
+| ID     | Feature                                                                                    | Phase | Status  |
+| ------ | ------------------------------------------------------------------------------------------ | ----- | ------- |
+| WRD-01 | Add clothes from photos and screenshots of things you bought                               | 1     | done    |
+| WRD-02 | Add clothes from product links, reading the product page                                   | 1     | done    |
+| WRD-03 | Edit pieces: category, colour, warmth, style, have it or to get; first guess from the name | 1     | done    |
+| WRD-04 | Closet kept per person across trips                                                        | 1     | done    |
+| WRD-05 | AI reads photos and screenshots: several pieces per image, tagged, background removed      | 1     | planned |
+| WRD-06 | Bring in inspiration from Pinterest boards                                                 | 2     | planned |
+
+## Outfits (OUT)
+
+| ID     | Feature                                                                         | Phase | Status  |
+| ------ | ------------------------------------------------------------------------------- | ----- | ------- |
+| OUT-01 | Planner: every day with its weather, plans, and a Day and an Evening look       | 1     | done    |
+| OUT-02 | Drag pieces from the closet onto a look, or tap a piece and then a look         | 1     | done    |
+| OUT-03 | Plans per day (game drive, beach, dinner out) that shape the looks              | 1     | done    |
+| OUT-04 | Notes on what a look is missing for the weather and the plans                   | 1     | done    |
+| OUT-05 | AI suggests looks from your closet, the weather, the plans and current trends   | 1     | planned |
+| OUT-06 | Find pieces to buy from brands you name                                         | 2     | planned |
+| OUT-07 | Looks per traveler                                                              | 2     | planned |
+| OUT-08 | What repeats, what to leave home, and how well the capsule mixes                | 2     | planned |
+
+## Packing (PCK)
+
+| ID     | Feature                                                                  | Phase | Status  |
+| ------ | ------------------------------------------------------------------------ | ----- | ------- |
+| PCK-01 | One checklist: clothes, essentials, documents                            | 1     | done    |
+| PCK-02 | Clothes come from the looks, each piece once, with how often it's worn   | 1     | done    |
+| PCK-03 | Packed state shared between travelers                                    | 2     | planned |
+| PCK-04 | Luggage limits (carry-on only) shape the plan                            | 2     | planned |
+
 ## Platform (PLT)
 
 | ID     | Feature                                                          | Phase | Status   |
@@ -29,6 +66,7 @@ us. Status is `planned`, `building` or `done`.
 | TRP-06 | "Today" view: what's next, confirmation numbers, weather, outfit                           | 2     | planned |
 | TRP-07 | Calendar export (.ics)                                                                     | 2     | planned |
 | TRP-08 | Trip templates by kind (cruise, ski, wedding guest, work)                                  | 3     | planned |
+| TRP-09 | Home: every trip, the countdown, and everything left to do across them                     | 1     | done    |
 
 ## Bookings inbox (BKG)
 
@@ -79,31 +117,6 @@ us. Status is `planned`, `building` or `done`.
 | WX-01 | Climate averages for far-off dates, from historical data | 1     | done    |
 | WX-02 | Forecast once the date is within range, refreshed daily  | 1     | done    |
 | WX-03 | Weather changes flagged against the outfit plan          | 2     | planned |
-
-## Wardrobe (WRD)
-
-| ID     | Feature                                                                          | Phase | Status  |
-| ------ | -------------------------------------------------------------------------------- | ----- | ------- |
-| WRD-01 | Add clothes from photos (one or many pieces per photo)                           | 1     | planned |
-| WRD-02 | Add clothes from product links, reading the product page                         | 1     | planned |
-| WRD-03 | Edit pieces: category, color, warmth, dressiness, status (have, ordered, to buy) | 1     | planned |
-| WRD-04 | Wardrobe kept per person across trips                                            | 1     | planned |
-
-## Outfits (OUT)
-
-| ID     | Feature                                                          | Phase | Status  |
-| ------ | ---------------------------------------------------------------- | ----- | ------- |
-| OUT-01 | Outfits per day and traveler from weather, plans and dress codes | 1     | planned |
-| OUT-02 | Edit outfits by hand                                             | 1     | planned |
-| OUT-03 | What's missing, what repeats, what to leave home                 | 1     | planned |
-
-## Packing (PCK)
-
-| ID     | Feature                                                     | Phase | Status  |
-| ------ | ----------------------------------------------------------- | ----- | ------- |
-| PCK-01 | One checklist: clothes, essentials, documents, per traveler | 1     | done    |
-| PCK-02 | Packed state shared between travelers                       | 1     | planned |
-| PCK-03 | Luggage limits (carry-on only) shape the plan               | 1     | planned |
 
 ## Sharing and notifications (SHR, NTF)
 
