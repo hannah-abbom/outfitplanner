@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from "expo-router/ui";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -52,9 +52,13 @@ export default function TabsLayout() {
 
 function TabButton({ label, isFocused, ...props }: Omit<TabTriggerSlotProps, "ref"> & { label: string }) {
   const c = usePalette();
+  // The tab navigates itself and isn't a link: a page embedded in another (like an artifact) can have its link
+  // clicks intercepted, and the trigger's own handler skips clicks the host has already marked as handled.
+  const { href, onPress: _onPress, ...rest } = props;
   return (
     <Pressable
-      {...props}
+      {...rest}
+      onPress={() => href && router.navigate(href as Href)}
       accessibilityRole="tab"
       accessibilityState={{ selected: !!isFocused }}
       style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 48 }}
