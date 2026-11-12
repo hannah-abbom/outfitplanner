@@ -52,6 +52,8 @@ export const ClosetItem = z.object({
   tags: z.array(StyleTag),
   /** A photo or screenshot saved on the phone, or the product image from a link. */
   image: z.string().nullable(),
+  /** The photo as taken, when `image` is the sticker cut out of it. */
+  original: z.string().nullish(),
   source: z.enum(["photo", "screenshot", "link", "manual"]),
   link: z.string().nullable(),
   brand: z.string().nullable(),

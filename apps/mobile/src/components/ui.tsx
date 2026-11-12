@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   Pressable,
   ScrollView,
@@ -9,8 +9,10 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PressScale } from "@/components/motion";
 import { Fonts, Radius, Space, usePalette } from "@/constants/theme";
 
 type TextProps = { children: ReactNode; style?: StyleProp<TextStyle>; numberOfLines?: number };
@@ -313,12 +315,13 @@ export function Button({
   const bg = kind === "primary" ? c.button : kind === "accent" ? c.accent : "transparent";
   const fg = kind === "primary" ? c.onButton : kind === "accent" ? c.onAccent : c.ink;
   return (
-    <Pressable
+    <PressScale
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
+      to={0.97}
+      style={[
         {
           minHeight: 50,
           borderRadius: Radius.pill,
@@ -328,7 +331,7 @@ export function Button({
           backgroundColor: bg,
           borderWidth: kind === "secondary" ? 1 : 0,
           borderColor: c.ink,
-          opacity: disabled ? 0.4 : pressed ? 0.75 : 1,
+          opacity: disabled ? 0.4 : 1,
         },
         style,
       ]}
@@ -344,7 +347,7 @@ export function Button({
       >
         {label}
       </Text>
-    </Pressable>
+    </PressScale>
   );
 }
 
@@ -431,15 +434,37 @@ export function Chip({
   };
   if (!onPress) return <View style={style}>{content}</View>;
   return (
-    <Pressable
+    <PressScale
       accessibilityRole="button"
       accessibilityState={{ selected: !!on }}
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
       hitSlop={6}
-      style={({ pressed }) => [style, pressed && { opacity: 0.7 }]}
+      to={0.92}
+      style={style}
     >
       {content}
-    </Pressable>
+    </PressScale>
+  );
+}
+
+/** A thin line that fills to show progress, easing to each new value. */
+export function ProgressLine({ value }: { value: number }) {
+  const c = usePalette();
+  const share = useSharedValue(0);
+  useEffect(() => {
+    share.set(
+      withTiming(Math.max(0, Math.min(1, value)), { duration: 700, easing: Easing.out(Easing.cubic) }),
+    );
+  }, [value, share]);
+  const fill = useAnimatedStyle(() => ({ width: `${share.get() * 100}%` }));
+  return (
+    <View
+      style={{ height: 2, backgroundColor: c.line }}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: Math.round(value * 100) }}
+    >
+      <Animated.View style={[{ height: 2, backgroundColor: c.accent }, fill]} />
+    </View>
   );
 }

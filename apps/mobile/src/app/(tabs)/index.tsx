@@ -13,6 +13,7 @@ import {
   Button,
   Eyebrow,
   Muted,
+  ProgressLine,
   Row,
   Rule,
   Screen,
@@ -236,9 +237,7 @@ function Outfits({ t, onPlan }: { t: TripState; onPlan: () => void }) {
           <Text style={{ fontSize: 16, color: c.muted }}> / {days.length} days</Text>
         </Text>
       </View>
-      <View style={{ height: 2, backgroundColor: c.line }}>
-        <View style={{ width: `${pct * 100}%`, height: 2, backgroundColor: c.accent }} />
-      </View>
+      <ProgressLine value={pct} />
       {pieces.length > 0 ? (
         <View style={{ flexDirection: "row", gap: 8 }}>
           {pieces.map((p) => (

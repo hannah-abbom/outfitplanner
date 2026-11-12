@@ -27,6 +27,7 @@ const SHAPES: Record<Category, { body: string; lines?: string }> = {
   },
 };
 
+/** The drawing, with a white die-cut edge so it sits among photo stickers as one of them. */
 export function Flat({
   category,
   color,
@@ -43,10 +44,11 @@ export function Flat({
     <Svg
       width={size}
       height={size}
-      viewBox="0 0 64 64"
+      viewBox="-4 -4 72 72"
       accessibilityElementsHidden
       importantForAccessibility="no"
     >
+      <Path d={shape.body} fill={c.sticker} stroke={c.sticker} strokeWidth={7} strokeLinejoin="round" />
       <Path d={shape.body} fill={fill} stroke={c.ink} strokeWidth={1} strokeLinejoin="round" />
       {shape.lines && (
         <Path d={shape.lines} fill="none" stroke={c.ink} strokeWidth={1} strokeLinejoin="round" />

@@ -185,6 +185,16 @@ server (with size, time and redirect limits) to read the page's title, descripti
 prototype's guessing from the URL. Outfit planning streams its progress to the page. Packing derivation, repeats and
 "leave at home" are pure functions in core.
 
+Pieces are shown as stickers (WRD-07), so a closet of mixed photos, screenshots and drawings reads as one set. On the
+web the piece is cut out of its photo on the device with MediaPipe's interactive segmenter (the Magic Touch model,
+Apache-2.0): the mask under a point, the middle of the photo unless the person taps elsewhere, becomes the alpha, and
+a white border is stamped around the outline. MediaPipe is loaded as a plain script from `public/cutout/` rather than
+bundled, because Metro can't bundle its dynamic import, and only when a sticker is wanted.
+`pnpm --filter @trip/mobile assets:cutout` puts the runtime there before a web export; the model ships as base64 text
+because the artifact host serves only web media types. The piece keeps the photo in `original`, so the sticker can be
+redone or turned back into the photo. Web images live in IndexedDB, not in saved settings. The phone app shows photos
+framed until a development build can use the system's subject lifting (Apple Vision, ML Kit).
+
 ## Privacy and security
 
 - No passport numbers, ever. Nationality and expiry date are enough for every rule we run.

@@ -23,6 +23,7 @@ import {
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DraggablePiece, DropZone } from "@/components/drag";
@@ -36,6 +37,7 @@ import {
   Eyebrow,
   Mono,
   Muted,
+  ProgressLine,
   Rule,
   Segmented,
   Serif,
@@ -326,7 +328,12 @@ function Look({
           }}
         >
           {pieces.map((p) => (
-            <View key={p.id}>
+            <Animated.View
+              key={p.id}
+              entering={ZoomIn.springify().damping(13).stiffness(220)}
+              exiting={ZoomOut.duration(160)}
+              layout={LinearTransition.springify().damping(18)}
+            >
               <PieceThumb item={p} width={46} onPress={() => t.removeFromLook(day.date, slot, p.id)} />
               <View
                 pointerEvents="none"
@@ -344,7 +351,7 @@ function Look({
               >
                 <Icon name="close" color={c.ink} size={9} strokeWidth={2.2} />
               </View>
-            </View>
+            </Animated.View>
           ))}
           {pieces.length === 0 && (
             <Text
@@ -540,9 +547,7 @@ function Suitcase({ days }: { days: TripDay[] }) {
           </Muted>
           <Mono>{Math.round(pct * 100)}%</Mono>
         </View>
-        <View style={{ height: 2, backgroundColor: c.line }}>
-          <View style={{ width: `${pct * 100}%`, height: 2, backgroundColor: c.accent }} />
-        </View>
+        <ProgressLine value={pct} />
       </View>
 
       {bare > 0 && (
@@ -668,7 +673,11 @@ function Box({ on }: { on: boolean }) {
         justifyContent: "center",
       }}
     >
-      {on && <Icon name="check" color={c.paper} size={13} strokeWidth={2.4} />}
+      {on && (
+        <Animated.View entering={ZoomIn.springify().damping(10).stiffness(260)}>
+          <Icon name="check" color={c.paper} size={13} strokeWidth={2.4} />
+        </Animated.View>
+      )}
     </View>
   );
 }

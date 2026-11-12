@@ -20,6 +20,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/icons";
@@ -260,11 +261,14 @@ export function StylistSheet({
           {phase.kind === "done" && (
             <>
               {!!phase.answer.note && <Serif size={20}>{phase.answer.note}</Serif>}
-              {phase.answer.looks.map((look) => {
+              {phase.answer.looks.map((look, n) => {
                 const off = !!skip[look.date];
                 return (
-                  <View
+                  <Animated.View
                     key={look.date}
+                    entering={FadeInDown.delay(Math.min(n, 8) * 70)
+                      .springify()
+                      .damping(16)}
                     style={{
                       borderTopWidth: 1,
                       borderTopColor: c.ink,
@@ -311,7 +315,7 @@ export function StylistSheet({
                         {look.why}
                       </Serif>
                     )}
-                  </View>
+                  </Animated.View>
                 );
               })}
 

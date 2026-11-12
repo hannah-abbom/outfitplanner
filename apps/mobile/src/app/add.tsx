@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,6 +16,7 @@ import { Icon, type IconName } from "@/components/icons";
 import { Button, Eyebrow, Muted, Row, Rule, Serif, Title } from "@/components/ui";
 import { Fonts, Radius, Space, usePalette } from "@/constants/theme";
 import { CaptureError, pickImage, readLink, setDraft, type Draft } from "@/lib/capture";
+import { warmUpCutOut } from "@/lib/cutout";
 import { useTrip } from "@/state/trip-store";
 
 /** The plus button: clothes first, because the closet is what the planner is built from; then trips. */
@@ -27,6 +28,8 @@ export default function AddScreen() {
   const [showLink, setShowLink] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Load the sticker cutter while they choose a photo, so the sticker is ready when the piece opens.
+  useEffect(() => warmUpCutOut(), []);
 
   async function go(get: () => Promise<Draft | null>) {
     setError(null);

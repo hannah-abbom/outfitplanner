@@ -4,7 +4,18 @@ import { useMemo, useState } from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "@/components/icons";
-import { Body, Button, Chip, Eyebrow, Muted, Rule, Strong, Tag, type Tone } from "@/components/ui";
+import {
+  Body,
+  Button,
+  Chip,
+  Eyebrow,
+  Muted,
+  ProgressLine,
+  Rule,
+  Strong,
+  Tag,
+  type Tone,
+} from "@/components/ui";
 import { Fonts, Space, usePalette } from "@/constants/theme";
 import { dayLabel } from "@/lib/format";
 import { useTrip } from "@/state/trip-store";
@@ -50,9 +61,7 @@ export function Ready() {
         <Muted>
           {doneCount} of {mine.length} ready
         </Muted>
-        <View style={{ height: 2, backgroundColor: c.line }}>
-          <View style={{ width: `${pct * 100}%`, height: 2, backgroundColor: c.accent }} />
-        </View>
+        <ProgressLine value={pct} />
       </View>
 
       <Eyebrow style={{ marginTop: Space.md }}>To do</Eyebrow>

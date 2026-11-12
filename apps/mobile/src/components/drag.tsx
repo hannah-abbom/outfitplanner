@@ -12,8 +12,9 @@ import {
 } from "react";
 import { Platform, View, type HostInstance, type StyleProp, type ViewStyle } from "react-native";
 import { GestureDetector, usePanGesture, type PanGestureActiveEvent } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
+import { SPRING } from "@/components/motion";
 import { PieceThumb } from "@/components/piece";
 import { usePalette } from "@/constants/theme";
 
@@ -53,8 +54,10 @@ export function DragProvider({ children }: { children: ReactNode }) {
   const [dragging, setDragging] = useState<ClosetItem | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   const hoverRef = useRef<string | null>(null);
+  const c = usePalette();
   const x = useSharedValue(0);
   const y = useSharedValue(0);
+  const lift = useSharedValue(0);
 
   const hit = useCallback((px: number, py: number): string | null => {
     for (const [id, z] of zones.current) {
@@ -93,6 +96,8 @@ export function DragProvider({ children }: { children: ReactNode }) {
         }
         x.set(px);
         y.set(py);
+        lift.set(0);
+        lift.set(withSpring(1, SPRING));
         draggingRef.current = item;
         setDragging(item);
         selectable(false);
@@ -115,11 +120,17 @@ export function DragProvider({ children }: { children: ReactNode }) {
       dragging,
       hover,
     }),
-    [register, dragging, hover, hit, setHoverIf, x, y],
+    [register, dragging, hover, hit, setHoverIf, x, y, lift],
   );
 
+  // The piece peels up off the tray: it grows a little and tilts, like a sticker lifted by one corner.
   const ghost = useAnimatedStyle(() => ({
-    transform: [{ translateX: x.get() - GHOST.w / 2 }, { translateY: y.get() - GHOST.h * 0.8 }],
+    transform: [
+      { translateX: x.get() - GHOST.w / 2 },
+      { translateY: y.get() - GHOST.h * 0.8 },
+      { scale: 1 + lift.get() * 0.14 },
+      { rotate: `${lift.get() * -8}deg` },
+    ],
   }));
 
   return (
@@ -134,12 +145,11 @@ export function DragProvider({ children }: { children: ReactNode }) {
                 position: "absolute",
                 left: 0,
                 top: 0,
-                shadowColor: "#000",
+                shadowColor: c.ink,
                 shadowOpacity: 0.25,
                 shadowRadius: 12,
                 shadowOffset: { width: 0, height: 8 },
                 elevation: 8,
-                transform: [{ scale: 1.05 }],
               },
               ghost,
             ]}
@@ -237,17 +247,24 @@ export function DropZone({
   }, [id, register]);
 
   const over = drag.hover === id;
+  // The look swells a little under a piece, to say "drop it here".
+  const swell = useSharedValue(1);
+  useEffect(() => {
+    swell.set(withSpring(over ? 1.025 : 1, SPRING));
+  }, [over, swell]);
+  const grow = useAnimatedStyle(() => ({ transform: [{ scale: swell.get() }] }));
   return (
-    <View
-      ref={ref}
-      accessibilityLabel={accessibilityLabel}
-      style={[
-        style,
-        drag.dragging && { borderColor: c.ink, borderStyle: "dashed" },
-        over && { backgroundColor: c.accentSoft, borderColor: c.accent, borderStyle: "solid" },
-      ]}
-    >
-      {children}
+    <View ref={ref} accessibilityLabel={accessibilityLabel}>
+      <Animated.View
+        style={[
+          style,
+          drag.dragging && { borderColor: c.ink, borderStyle: "dashed" },
+          over && { backgroundColor: c.accentSoft, borderColor: c.accent, borderStyle: "solid" },
+          grow,
+        ]}
+      >
+        {children}
+      </Animated.View>
     </View>
   );
 }

@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Sticker cut-out runtime and model, fetched by scripts/fetch-cutout-assets.mjs
+public/cutout/

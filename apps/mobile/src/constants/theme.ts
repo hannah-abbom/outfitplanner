@@ -19,6 +19,9 @@ const light = {
   button: "#111111",
   onButton: "#ffffff",
   scrim: "rgba(0,0,0,0.55)",
+  /** Stickers keep a white die-cut edge in both themes, like the real thing. */
+  sticker: "#ffffff",
+  stickerShadow: "rgba(17,17,17,0.18)",
   /** The flight screen is dark in both themes. */
   pass: "#0b0b0b",
   onPass: "#f4f3f0",
@@ -40,6 +43,8 @@ const dark: typeof light = {
   button: "#f4f3f0",
   onButton: "#0b0b0b",
   scrim: "rgba(0,0,0,0.6)",
+  sticker: "#ffffff",
+  stickerShadow: "rgba(0,0,0,0.55)",
   pass: "#000000",
   onPass: "#f4f3f0",
   passMuted: "#8c8c8c",

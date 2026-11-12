@@ -16,8 +16,9 @@ keep the rest of the trip in hand.
 | WRD-02 | Add clothes from product links, reading the product page                                           | 1     | done    |
 | WRD-03 | Edit pieces: category, colour, warmth, style, have it or to get, a note; first guess from the name | 1     | done    |
 | WRD-04 | Closet kept per person across trips                                                                | 1     | done    |
-| WRD-05 | AI reads photos and screenshots: several pieces per image, tagged, background removed              | 1     | planned |
+| WRD-05 | AI reads photos and screenshots: several pieces per image, tagged                                  | 1     | planned |
 | WRD-06 | Bring in inspiration from Pinterest boards                                                         | 2     | planned |
+| WRD-07 | Stickers: each piece cut out of its photo on the device, with a white die-cut edge                 | 1     | web     |
 
 ## Outfits (OUT)
 

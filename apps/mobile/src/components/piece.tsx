@@ -1,11 +1,23 @@
 import type { ClosetItem } from "@trip/core";
 import { Image } from "expo-image";
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Flat } from "@/components/flat";
+import { PressScale } from "@/components/motion";
 import { Fonts, usePalette } from "@/constants/theme";
+import { useImageUri } from "@/lib/images";
 
-/** A piece as a tile: its photo, or a drawing in its colour when it has none. */
+/** Each piece leans a little, the same way every time, like stickers pressed on by hand. */
+export function tiltOf(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return ((Math.abs(h) % 9) - 4) * 0.8;
+}
+
+/**
+ * A piece as a sticker: its cut-out, its photo in a white die-cut frame, or its drawing with a white edge. Every
+ * kind sits the same way on the tile, so a closet of mixed photos still looks like one set.
+ */
 export function PieceThumb({
   item,
   width,
@@ -13,6 +25,7 @@ export function PieceThumb({
   onPress,
   selected,
   showToGet = true,
+  tilt = true,
   style,
 }: {
   item: ClosetItem;
@@ -21,9 +34,13 @@ export function PieceThumb({
   onPress?: () => void;
   selected?: boolean;
   showToGet?: boolean;
+  tilt?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   const c = usePalette();
+  const uri = useImageUri(item.image);
+  const isSticker = !!item.image && !!item.original;
+  const shadow = { filter: `drop-shadow(0px 2px 3px ${c.stickerShadow})` } as const;
   const body = (
     <View
       style={[
@@ -40,16 +57,46 @@ export function PieceThumb({
         style,
       ]}
     >
-      {item.image ? (
-        <Image
-          source={{ uri: item.image }}
-          style={{ width: "100%", height: "100%" }}
-          contentFit="cover"
-          transition={150}
-        />
-      ) : (
-        <Flat category={item.category} color={item.color} size={Math.round(Math.min(width, height) * 0.72)} />
-      )}
+      <View
+        style={[
+          {
+            width: "84%",
+            height: "84%",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: [{ rotate: `${tilt ? tiltOf(item.id) : 0}deg` }],
+          },
+          shadow,
+        ]}
+      >
+        {uri && isSticker && (
+          <Image
+            source={{ uri }}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="contain"
+            transition={150}
+          />
+        )}
+        {uri && !isSticker && (
+          <View
+            style={{ width: "88%", height: "88%", padding: 3, backgroundColor: c.sticker, borderRadius: 6 }}
+          >
+            <Image
+              source={{ uri }}
+              style={{ flex: 1, borderRadius: 4 }}
+              contentFit="cover"
+              transition={150}
+            />
+          </View>
+        )}
+        {!uri && (
+          <Flat
+            category={item.category}
+            color={item.color}
+            size={Math.round(Math.min(width, height) * 0.8)}
+          />
+        )}
+      </View>
       {showToGet && item.status === "to-get" && (
         <View
           style={{
@@ -79,14 +126,14 @@ export function PieceThumb({
   );
   if (!onPress) return body;
   return (
-    <Pressable
+    <PressScale
       accessibilityRole="button"
       accessibilityLabel={item.name}
       accessibilityState={{ selected: !!selected }}
       onPress={onPress}
-      style={({ pressed }) => pressed && { opacity: 0.7 }}
+      to={0.92}
     >
       {body}
-    </Pressable>
+    </PressScale>
   );
 }

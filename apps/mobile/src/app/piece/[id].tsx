@@ -15,11 +15,18 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput,
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Close } from "@/components/close";
-import { PieceThumb } from "@/components/piece";
+import { StickerMaker } from "@/components/sticker-maker";
 import { Button, Chip, Eyebrow, Muted, Segmented, Title } from "@/components/ui";
 import { Fonts, Radius, Space, usePalette } from "@/constants/theme";
 import { takeDraft } from "@/lib/capture";
+import { storeImage } from "@/lib/images";
 import { newId, useStore } from "@/state/trip-store";
+
+/** Inline images (a sticker just made, a photo just picked) are stored before the piece is saved. */
+async function keep(src: string | null | undefined): Promise<string | null> {
+  if (!src) return null;
+  return src.startsWith("data:") || src.startsWith("blob:") ? storeImage(src) : src;
+}
 
 const TAG_LABEL: Record<StyleTag, string> = {
   casual: "Casual",
@@ -89,6 +96,7 @@ export default function PieceScreen() {
     minHeight: 44,
   } as const;
   const valid = item.name.trim().length > 0;
+  const [saving, setSaving] = useState(false);
 
   return (
     <KeyboardAvoidingView
@@ -109,18 +117,12 @@ export default function PieceScreen() {
           <Close />
         </View>
 
-        <View style={{ alignItems: "center", gap: 6 }}>
-          <PieceThumb item={item} width={168} showToGet={false} />
-          <Muted>
-            {item.source === "screenshot"
-              ? "From a screenshot"
-              : item.source === "link"
-                ? "From a link"
-                : item.source === "photo"
-                  ? "From a photo"
-                  : "No photo: drawn in its colour"}
-          </Muted>
-        </View>
+        <StickerMaker
+          item={item}
+          auto={!existing}
+          onChange={(images) => setItem((i) => ({ ...i, ...images }))}
+        />
+        {!item.image && <Muted style={{ textAlign: "center" }}>No photo yet: drawn in its colour.</Muted>}
 
         <Eyebrow style={{ marginTop: Space.sm }}>Name</Eyebrow>
         <TextInput
@@ -237,10 +239,13 @@ export default function PieceScreen() {
         />
 
         <Button
-          label={existing ? "Save" : "Add to closet"}
-          disabled={!valid}
-          onPress={() => {
-            savePiece({ ...item, name: item.name.trim() });
+          label={saving ? "Saving" : existing ? "Save" : "Add to closet"}
+          disabled={!valid || saving}
+          onPress={async () => {
+            setSaving(true);
+            // Photos and stickers go to the device's image store; the closet keeps a short reference to them.
+            const [image, original] = await Promise.all([keep(item.image), keep(item.original)]);
+            savePiece({ ...item, image, original, name: item.name.trim() });
             router.back();
           }}
           style={{ marginTop: Space.md }}
