@@ -29,7 +29,9 @@ export default function TripScreen() {
       <Screen>
         <Eyebrow>Trip</Eyebrow>
         <Title>No trip yet</Title>
-        <Body style={{ color: c.muted }}>Import your agent’s itinerary to see every day, booking and entry rule here.</Body>
+        <Body style={{ color: c.muted }}>
+          Import your agent’s itinerary to see every day, booking and entry rule here.
+        </Body>
         <Button label="Add a trip" onPress={() => router.push("/trip-settings")} />
       </Screen>
     );
@@ -46,7 +48,9 @@ export default function TripScreen() {
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
         <Eyebrow style={{ flex: 1 }}>{rangeLabel(trip.start, trip.end)}</Eyebrow>
         <Pressable accessibilityRole="button" onPress={() => router.push("/trip-settings")} hitSlop={12}>
-          <Eyebrow style={{ color: c.ink, borderBottomWidth: 1, borderBottomColor: c.ink, paddingBottom: 2 }}>Settings</Eyebrow>
+          <Eyebrow style={{ color: c.ink, borderBottomWidth: 1, borderBottomColor: c.ink, paddingBottom: 2 }}>
+            Settings
+          </Eyebrow>
         </Pressable>
       </View>
       <Title numberOfLines={3}>{trip.name}</Title>

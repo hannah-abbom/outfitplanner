@@ -28,6 +28,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DraggablePiece, DropZone } from "@/components/drag";
 import { Icon } from "@/components/icons";
 import { PieceThumb } from "@/components/piece";
+import { StylistSheet } from "@/components/stylist-sheet";
 import {
   Body,
   Button,
@@ -58,6 +59,7 @@ export default function OutfitsScreen() {
   const [mode, setMode] = useState<View2>("plan");
   const [selected, setSelected] = useState<string | null>(null);
   const [planFor, setPlanFor] = useState<IsoDate | null>(null);
+  const [styling, setStyling] = useState(false);
 
   const days = useMemo(() => (t.trip ? buildDays(t.trip) : []), [t.trip]);
   const tabH = 54 + Math.max(insets.bottom, 12);
@@ -65,7 +67,15 @@ export default function OutfitsScreen() {
 
   if (!t.trip) {
     return (
-      <View style={{ flex: 1, backgroundColor: c.paper, paddingTop: insets.top + Space.xl, paddingHorizontal: Space.xl, gap: Space.md }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: c.paper,
+          paddingTop: insets.top + Space.xl,
+          paddingHorizontal: Space.xl,
+          gap: Space.md,
+        }}
+      >
         <Eyebrow>Outfits</Eyebrow>
         <Title>Dress every day of the trip</Title>
         <Body style={{ color: c.muted }}>
@@ -77,7 +87,11 @@ export default function OutfitsScreen() {
   }
 
   const dressed = days.filter((d) => isDressed(t.looks[d.date])).length;
-  const toGet = suitcase(t.looks, t.closet, days.map((d) => d.date)).filter((l) => l.item.status === "to-get").length;
+  const toGet = suitcase(
+    t.looks,
+    t.closet,
+    days.map((d) => d.date),
+  ).filter((l) => l.item.status === "to-get").length;
   const selectedItem = t.closet.find((i) => i.id === selected) ?? null;
 
   return (
@@ -96,6 +110,7 @@ export default function OutfitsScreen() {
           {dressed} of {days.length} days dressed
           {toGet > 0 ? ` · ${toGet} piece${toGet === 1 ? "" : "s"} to get` : ""}
         </Muted>
+        <Button label="Suggest looks" kind="accent" onPress={() => setStyling(true)} />
         <Segmented<View2>
           value={mode}
           onChange={setMode}
@@ -122,6 +137,7 @@ export default function OutfitsScreen() {
       )}
 
       <PlanPicker date={planFor} onClose={() => setPlanFor(null)} />
+      <StylistSheet visible={styling} days={days} onClose={() => setStyling(false)} />
     </View>
   );
 }
@@ -145,13 +161,21 @@ function Plan({
         return (
           <View key={`${g.stay?.id ?? "way"}-${g.days[0]?.date}`} style={{ gap: Space.md }}>
             <View style={{ gap: 2 }}>
-              <Eyebrow>{g.stay ? `Chapter ${roman(chapter)} · ${nights(g.stay.nights)}` : "On the way"}</Eyebrow>
+              <Eyebrow>
+                {g.stay ? `Chapter ${roman(chapter)} · ${nights(g.stay.nights)}` : "On the way"}
+              </Eyebrow>
               <Serif size={24} numberOfLines={2}>
                 {g.stay ? g.stay.name : "Travel days"}
               </Serif>
             </View>
             {g.days.map((d) => (
-              <DayLooks key={d.date} day={d} selected={selected} onPlaced={onPlaced} onPlans={() => onPlans(d.date)} />
+              <DayLooks
+                key={d.date}
+                day={d}
+                selected={selected}
+                onPlaced={onPlaced}
+                onPlans={() => onPlans(d.date)}
+              />
             ))}
           </View>
         );
@@ -201,7 +225,9 @@ function DayLooks({
       >
         <View style={{ width: 44 }}>
           <Eyebrow>{block.weekday}</Eyebrow>
-          <Text style={{ fontFamily: Fonts.serifUpright, fontSize: 30, lineHeight: 34, color: c.ink }}>{block.day}</Text>
+          <Text style={{ fontFamily: Fonts.serifUpright, fontSize: 30, lineHeight: 34, color: c.ink }}>
+            {block.day}
+          </Text>
         </View>
         <View style={{ flex: 1 }}>
           <Muted numberOfLines={1}>{dayLine(day)}</Muted>
@@ -229,7 +255,16 @@ function DayLooks({
       </View>
 
       {LOOK_SLOTS.map((slot) => (
-        <Look key={slot} day={day} slot={slot} label={slot === "day" ? (travel ? "Travel" : "Day") : "Evening"} plans={plans} selected={selected} onPlaced={onPlaced} fmt={fmt} />
+        <Look
+          key={slot}
+          day={day}
+          slot={slot}
+          label={slot === "day" ? (travel ? "Travel" : "Day") : "Evening"}
+          plans={plans}
+          selected={selected}
+          onPlaced={onPlaced}
+          fmt={fmt}
+        />
       ))}
     </View>
   );
@@ -281,30 +316,52 @@ function Look({
             t.addToLook(day.date, slot, selected.id);
             onPlaced();
           }}
-          style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, padding: 6, minHeight: 70, alignItems: "center" }}
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 6,
+            padding: 6,
+            minHeight: 70,
+            alignItems: "center",
+          }}
         >
           {pieces.map((p) => (
             <View key={p.id}>
-              <PieceThumb
-                item={p}
-                width={46}
-                onPress={() => t.removeFromLook(day.date, slot, p.id)}
-              />
+              <PieceThumb item={p} width={46} onPress={() => t.removeFromLook(day.date, slot, p.id)} />
               <View
                 pointerEvents="none"
-                style={{ position: "absolute", top: 2, right: 2, width: 14, height: 14, borderRadius: 7, backgroundColor: c.paper, alignItems: "center", justifyContent: "center" }}
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 2,
+                  width: 14,
+                  height: 14,
+                  borderRadius: 7,
+                  backgroundColor: c.paper,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Icon name="close" color={c.ink} size={9} strokeWidth={2.2} />
               </View>
             </View>
           ))}
           {pieces.length === 0 && (
-            <Text style={{ fontFamily: Fonts.body, fontSize: 12, color: selected ? c.accent : c.faint, paddingHorizontal: 6 }}>
+            <Text
+              style={{
+                fontFamily: Fonts.body,
+                fontSize: 12,
+                color: selected ? c.accent : c.faint,
+                paddingHorizontal: 6,
+              }}
+            >
               {selected ? `Tap to add ${selected.name}` : "Drag pieces here"}
             </Text>
           )}
           {pieces.length > 0 && selected && (
-            <Text style={{ fontFamily: Fonts.medium, fontSize: 18, color: c.accent, paddingHorizontal: 8 }}>+</Text>
+            <Text style={{ fontFamily: Fonts.medium, fontSize: 18, color: c.accent, paddingHorizontal: 8 }}>
+              +
+            </Text>
           )}
         </Pressable>
       </DropZone>
@@ -360,9 +417,15 @@ function Tray({
       </View>
       {closet.length === 0 ? (
         <View style={{ paddingHorizontal: Space.xl, gap: 8 }}>
-          <Muted>Add photos, screenshots or links of what you’re bringing, then drag them onto each day.</Muted>
+          <Muted>
+            Add photos, screenshots or links of what you’re bringing, then drag them onto each day.
+          </Muted>
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button label="Add clothes" onPress={() => router.push("/add")} style={{ flex: 1, minHeight: 42 }} />
+            <Button
+              label="Add clothes"
+              onPress={() => router.push("/add")}
+              style={{ flex: 1, minHeight: 42 }}
+            />
             <Button
               label="Try samples"
               kind="secondary"
@@ -373,21 +436,43 @@ function Tray({
         </View>
       ) : (
         <>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingHorizontal: Space.xl }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 6, paddingHorizontal: Space.xl }}
+          >
             <Chip label="All" on={cat === "all"} onPress={() => setCat("all")} />
             {present.map((k) => (
               <Chip key={k} label={CATEGORY_LABEL[k]} on={cat === k} onPress={() => setCat(k)} />
             ))}
           </ScrollView>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: Space.xl }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, paddingHorizontal: Space.xl }}
+          >
             {shown.map((i) => (
-              <DraggablePiece key={i.id} item={i} width={56} selected={i.id === selected} onPress={() => onSelect(i.id)} />
+              <DraggablePiece
+                key={i.id}
+                item={i}
+                width={56}
+                selected={i.id === selected}
+                onPress={() => onSelect(i.id)}
+              />
             ))}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Add clothes"
               onPress={() => router.push("/add")}
-              style={{ width: 56, height: 70, borderWidth: 1, borderColor: c.line, borderStyle: "dashed", alignItems: "center", justifyContent: "center" }}
+              style={{
+                width: 56,
+                height: 70,
+                borderWidth: 1,
+                borderColor: c.line,
+                borderStyle: "dashed",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <Icon name="plus" color={c.ink} size={18} strokeWidth={1.4} />
             </Pressable>
@@ -406,10 +491,20 @@ function PlanPicker({ date, onClose }: { date: IsoDate | null; onClose: () => vo
   return (
     <Modal visible={date !== null} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: c.scrim }} />
-      <View style={{ backgroundColor: c.paper, padding: Space.xl, paddingBottom: insets.bottom + Space.xl, gap: Space.md }}>
+      <View
+        style={{
+          backgroundColor: c.paper,
+          padding: Space.xl,
+          paddingBottom: insets.bottom + Space.xl,
+          gap: Space.md,
+        }}
+      >
         <Eyebrow>{date ? dayLabel(date) : ""}</Eyebrow>
         <Serif size={28}>What’s the plan?</Serif>
-        <Muted>Plans shape the looks: swim for the beach, a layer for dawn game drives, something dressy for dinner.</Muted>
+        <Muted>
+          Plans shape the looks: swim for the beach, a layer for dawn game drives, something dressy for
+          dinner.
+        </Muted>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {PLAN_CHOICES.filter((p) => p !== "Travel day").map((p) => (
             <Chip key={p} label={p} on={current.includes(p)} onPress={() => date && t.togglePlan(date, p)} />
@@ -425,7 +520,11 @@ function PlanPicker({ date, onClose }: { date: IsoDate | null; onClose: () => vo
 function Suitcase({ days }: { days: TripDay[] }) {
   const c = usePalette();
   const t = useTrip();
-  const lines = suitcase(t.looks, t.closet, days.map((d) => d.date));
+  const lines = suitcase(
+    t.looks,
+    t.closet,
+    days.map((d) => d.date),
+  );
   const extras = t.trip ? essentialsFor(t.trip, requirementsFor(t.trip)) : [];
   const bare = days.filter((d) => !isDressed(t.looks[d.date])).length;
   const ids = [...lines.map((l) => `piece:${l.item.id}`), ...extras.map((e) => e.id)];
@@ -448,11 +547,14 @@ function Suitcase({ days }: { days: TripDay[] }) {
 
       {bare > 0 && (
         <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.accent }}>
-          {bare} day{bare === 1 ? "" : "s"} still without a look. Their pieces join this list as you plan them.
+          {bare} day{bare === 1 ? "" : "s"} still without a look. Their pieces join this list as you plan
+          them.
         </Text>
       )}
 
-      {lines.length === 0 && <Muted>Put pieces on your looks and they’ll appear here, each once, with how often it’s worn.</Muted>}
+      {lines.length === 0 && (
+        <Muted>Put pieces on your looks and they’ll appear here, each once, with how often it’s worn.</Muted>
+      )}
 
       {CATEGORIES.map((k) => {
         const mine = lines.filter((l) => l.item.category === k);
@@ -473,11 +575,22 @@ function Suitcase({ days }: { days: TripDay[] }) {
                   accessibilityState={{ checked: on }}
                   accessibilityLabel={`${l.item.name}, worn ${l.wears} times`}
                   onPress={() => t.togglePacked(id)}
-                  style={{ flexDirection: "row", alignItems: "center", gap: Space.md, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth * 2, borderBottomColor: c.line }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: Space.md,
+                    paddingVertical: 10,
+                    borderBottomWidth: StyleSheet.hairlineWidth * 2,
+                    borderBottomColor: c.line,
+                  }}
                 >
                   <PieceThumb item={l.item} width={40} showToGet={false} />
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Serif size={17} numberOfLines={1} style={on ? { color: c.faint, textDecorationLine: "line-through" } : undefined}>
+                    <Serif
+                      size={17}
+                      numberOfLines={1}
+                      style={on ? { color: c.faint, textDecorationLine: "line-through" } : undefined}
+                    >
                       {l.item.name}
                     </Serif>
                     <Mono>
@@ -515,10 +628,20 @@ function Extras({ title, items }: { title: string; items: PackItem[] }) {
             accessibilityRole="checkbox"
             accessibilityState={{ checked: on }}
             onPress={() => t.togglePacked(item.id)}
-            style={{ flexDirection: "row", alignItems: "center", gap: Space.md, paddingVertical: 12, minHeight: 52, borderBottomWidth: StyleSheet.hairlineWidth * 2, borderBottomColor: c.line }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: Space.md,
+              paddingVertical: 12,
+              minHeight: 52,
+              borderBottomWidth: StyleSheet.hairlineWidth * 2,
+              borderBottomColor: c.line,
+            }}
           >
             <View style={{ flex: 1 }}>
-              <Strong style={on ? { color: c.faint, textDecorationLine: "line-through" } : undefined}>{item.label}</Strong>
+              <Strong style={on ? { color: c.faint, textDecorationLine: "line-through" } : undefined}>
+                {item.label}
+              </Strong>
               {item.detail && <Muted>{item.detail}</Muted>}
             </View>
             {item.quantity > 1 && <Mono>×{item.quantity}</Mono>}

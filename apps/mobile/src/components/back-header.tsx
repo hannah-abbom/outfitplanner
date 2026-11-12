@@ -14,7 +14,17 @@ export function BackHeader({ label, color }: { label: string; color?: string }) 
       style={{ flexDirection: "row", alignItems: "center", gap: 4, minHeight: 44, alignSelf: "flex-start" }}
     >
       <Icon name="chevronLeft" color={fg} size={14} strokeWidth={1.6} />
-      <Text style={{ fontFamily: Fonts.medium, fontSize: 10.5, letterSpacing: 2, textTransform: "uppercase", color: fg }}>{label}</Text>
+      <Text
+        style={{
+          fontFamily: Fonts.medium,
+          fontSize: 10.5,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          color: fg,
+        }}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }

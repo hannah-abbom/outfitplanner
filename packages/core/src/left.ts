@@ -31,7 +31,11 @@ export interface TripProgress {
 /** Deadlines this close count as urgent. */
 const URGENT_DAYS = 3;
 
-export function whatsLeft({ trip, done, looks }: TripProgress, closet: ClosetItem[], today: IsoDate): LeftItem[] {
+export function whatsLeft(
+  { trip, done, looks }: TripProgress,
+  closet: ClosetItem[],
+  today: IsoDate,
+): LeftItem[] {
   if (trip.end < today) return [];
   const soon = addDays(today, URGENT_DAYS);
   const out: LeftItem[] = [];

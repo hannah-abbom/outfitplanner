@@ -37,7 +37,12 @@ export function Ready() {
       {trip.travelers.length > 1 && (
         <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
           {trip.travelers.map((t) => (
-            <Chip key={t.name} label={`${t.name} · ${t.nationalities.join("/")}`} on={t.name === current} onPress={() => setWho(t.name)} />
+            <Chip
+              key={t.name}
+              label={`${t.name} · ${t.nationalities.join("/")}`}
+              on={t.name === current}
+              onPress={() => setWho(t.name)}
+            />
           ))}
         </View>
       )}
@@ -54,7 +59,13 @@ export function Ready() {
       <Rule strong />
       {toDo.length === 0 && <Muted>Nothing left. Have a wonderful trip.</Muted>}
       {toDo.map((r, i) => (
-        <Task key={r.id} r={r} done={!!done[r.id]} last={i === toDo.length - 1} onToggle={() => toggleDone(r.id)} />
+        <Task
+          key={r.id}
+          r={r}
+          done={!!done[r.id]}
+          last={i === toDo.length - 1}
+          onToggle={() => toggleDone(r.id)}
+        />
       ))}
 
       <Eyebrow style={{ marginTop: Space.lg }}>By country</Eyebrow>
@@ -65,7 +76,14 @@ export function Ready() {
           .map((r) => (
             <View
               key={r.id}
-              style={{ flexDirection: "row", gap: Space.md, alignItems: "flex-start", paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth * 2, borderBottomColor: c.line }}
+              style={{
+                flexDirection: "row",
+                gap: Space.md,
+                alignItems: "flex-start",
+                paddingVertical: 12,
+                borderBottomWidth: StyleSheet.hairlineWidth * 2,
+                borderBottomColor: c.line,
+              }}
             >
               <View style={{ width: 96 }}>
                 <Eyebrow style={{ fontSize: 9.5 }}>{countryName(country)}</Eyebrow>
@@ -93,9 +111,24 @@ function labelOf(r: Requirement, done: boolean): string {
   return r.status === "todo" ? "To do" : "Check";
 }
 
-function Task({ r, done, last, onToggle }: { r: Requirement; done: boolean; last: boolean; onToggle: () => void }) {
+function Task({
+  r,
+  done,
+  last,
+  onToggle,
+}: {
+  r: Requirement;
+  done: boolean;
+  last: boolean;
+  onToggle: () => void;
+}) {
   const c = usePalette();
-  const when = r.dueFrom && r.dueBy ? `${dayLabel(r.dueFrom)} – ${dayLabel(r.dueBy)}` : r.dueBy ? `By ${dayLabel(r.dueBy)}` : null;
+  const when =
+    r.dueFrom && r.dueBy
+      ? `${dayLabel(r.dueFrom)} – ${dayLabel(r.dueBy)}`
+      : r.dueBy
+        ? `By ${dayLabel(r.dueBy)}`
+        : null;
   return (
     <View
       style={{
@@ -133,7 +166,11 @@ function Task({ r, done, last, onToggle }: { r: Requirement; done: boolean; last
         <Body style={{ fontSize: 13.5, lineHeight: 19, color: c.muted }}>{r.summary}</Body>
         {r.sources.map((s) => (
           <Pressable key={s.url} accessibilityRole="link" onPress={() => Linking.openURL(s.url)}>
-            <Text style={{ fontFamily: Fonts.body, fontSize: 12, color: c.ink, textDecorationLine: "underline" }}>{s.title}</Text>
+            <Text
+              style={{ fontFamily: Fonts.body, fontSize: 12, color: c.ink, textDecorationLine: "underline" }}
+            >
+              {s.title}
+            </Text>
           </Pressable>
         ))}
       </View>

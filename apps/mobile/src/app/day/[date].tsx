@@ -45,7 +45,9 @@ export default function DayScreen() {
         const pieces = piecesOf(looks[day.date]?.[slot], closet);
         return (
           <View key={slot} style={{ gap: 6 }}>
-            <Eyebrow style={{ fontSize: 9.5 }}>{slot === "day" ? (travel ? "Travel" : "Day") : "Evening"}</Eyebrow>
+            <Eyebrow style={{ fontSize: 9.5 }}>
+              {slot === "day" ? (travel ? "Travel" : "Day") : "Evening"}
+            </Eyebrow>
             {pieces.length ? (
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {pieces.map((p) => (
@@ -84,7 +86,15 @@ function Step({ item, last }: { item: DayItem; last: boolean }) {
     <View style={{ flexDirection: "row", gap: Space.sm }}>
       <Mono style={{ width: 44, paddingTop: 16 }}>{time}</Mono>
       <View style={{ width: 12, alignItems: "center" }}>
-        <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: item.kind === "gap" ? c.accent : c.ink, marginTop: 20 }} />
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 4,
+            backgroundColor: item.kind === "gap" ? c.accent : c.ink,
+            marginTop: 20,
+          }}
+        />
         {!last && <View style={{ flex: 1, width: 1, backgroundColor: c.line }} />}
       </View>
       <View style={{ flex: 1, paddingVertical: 6 }}>
@@ -102,7 +112,11 @@ function Content({ item }: { item: DayItem }) {
       const f = item.flight;
       return (
         <Card onPress={() => router.push({ pathname: "/flight/[id]", params: { id: f.id } })}>
-          <Serif size={18}>{item.kind === "depart" ? `Fly ${f.from.code} to ${f.to.code}` : `Land in ${f.to.city ?? f.to.code}`}</Serif>
+          <Serif size={18}>
+            {item.kind === "depart"
+              ? `Fly ${f.from.code} to ${f.to.code}`
+              : `Land in ${f.to.city ?? f.to.code}`}
+          </Serif>
           <Muted>{[f.airline, f.flightNumber].filter(Boolean).join(" ") || "Flight"} · local time</Muted>
         </Card>
       );
@@ -111,7 +125,9 @@ function Content({ item }: { item: DayItem }) {
     case "check-out":
       return (
         <Card onPress={() => router.push({ pathname: "/stay/[id]", params: { id: item.stay.id } })}>
-          <Serif size={18}>{item.kind === "check-in" ? `Check in at ${item.stay.name}` : `Check out of ${item.stay.name}`}</Serif>
+          <Serif size={18}>
+            {item.kind === "check-in" ? `Check in at ${item.stay.name}` : `Check out of ${item.stay.name}`}
+          </Serif>
           {item.kind === "check-in" && item.stay.room && <Muted>{item.stay.room}</Muted>}
         </Card>
       );

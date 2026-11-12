@@ -9,7 +9,17 @@ import { weatherKind, type DayWeather } from "./weather";
  * and the suitcase is whatever the looks use.
  */
 
-export const CATEGORIES = ["top", "bottom", "dress", "layer", "shoes", "swim", "bag", "accessory"] as const;
+export const CATEGORIES = [
+  "top",
+  "bottom",
+  "dress",
+  "set",
+  "layer",
+  "shoes",
+  "swim",
+  "bag",
+  "accessory",
+] as const;
 export const Category = z.enum(CATEGORIES);
 export type Category = z.infer<typeof Category>;
 
@@ -17,6 +27,7 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   top: "Tops",
   bottom: "Bottoms",
   dress: "Dresses",
+  set: "Sets",
   layer: "Layers",
   shoes: "Shoes",
   swim: "Swim",
@@ -44,6 +55,8 @@ export const ClosetItem = z.object({
   source: z.enum(["photo", "screenshot", "link", "manual"]),
   link: z.string().nullable(),
   brand: z.string().nullable(),
+  /** Anything the person said about it, such as where on the trip it's for. */
+  note: z.string().nullish(),
   /** "to-get" is something the plan needs that you don't own yet. */
   status: z.enum(["owned", "to-get"]),
   addedAt: z.string(),
@@ -100,11 +113,23 @@ const COLOR_ALIASES: Readonly<Record<string, string>> = {
 };
 
 /** Colours that stand out on a game drive. */
-const BRIGHT = new Set(["white", "red", "orange", "coral", "yellow", "pink", "blue", "light blue", "lilac", "purple"]);
+const BRIGHT = new Set([
+  "white",
+  "red",
+  "orange",
+  "coral",
+  "yellow",
+  "pink",
+  "blue",
+  "light blue",
+  "lilac",
+  "purple",
+]);
 
 const CATEGORY_WORDS: [Category, RegExp][] = [
-  ["swim", /\b(swim\w*|bikini|one-piece|bathing suit|trunks|rash ?guard)\b/],
-  ["dress", /\b(dress|gown|jumpsuit|romper|kaftan|caftan|playsuit)\b/],
+  ["swim", /\b(swim\w*|bikini|trikini|monokini|one-piece|bathing suit|trunks|rash ?guard)\b/],
+  ["dress", /\b((sun)?dress|gown|jumpsuit|romper|kaftan|caftan|playsuit)\b/],
+  ["set", /\b(set|co-?ord|two-piece)\b/],
   [
     "shoes",
     /\b(shoes?|sandals?|sneakers?|trainers?|boots?|heels?|loafers?|espadrilles?|flats|mules?|slides?|flip-?flops?|pumps?)\b/,
@@ -116,7 +141,10 @@ const CATEGORY_WORDS: [Category, RegExp][] = [
   ],
   ["bottom", /\b(pants|trousers|jeans|shorts|skirt|leggings|chinos|culottes|joggers)\b/],
   ["top", /\b(top|tee|t-shirt|shirt|blouse|cami|camisole|tank|bodysuit|polo|tunic|bralette|henley)\b/],
-  ["accessory", /\b(hat|cap|sunglasses|scarf|belt|earrings?|necklace|bracelet|ring|watch|sarong|headband)\b/],
+  [
+    "accessory",
+    /\b(hat|cap|sunglasses|scarf|belt|earrings?|necklace|bracelet|ring|watch|sarong|pareo|cover-?up|headband)\b/,
+  ],
 ];
 
 const WARM = /\b(wool|cashmere|knit|sweater|jumper|fleece|coat|parka|puffer|hoodie|sweatshirt|thermal)\b/;
@@ -125,7 +153,10 @@ const LIGHT =
 const TAG_WORDS: [StyleTag, RegExp][] = [
   ["dressy", /\b(silk|satin|heels?|blazer|gown|midi|maxi|clutch|pumps?|earrings?|necklace|sequin\w*)\b/],
   ["active", /\b(sneakers?|trainers?|leggings|sports?|running|hiking|athletic|fleece|joggers|walking)\b/],
-  ["beach", /\b(sarong|kaftan|caftan|cover-?up|flip-?flops?|slides?|espadrilles?|sun ?hat|straw|crochet)\b/],
+  [
+    "beach",
+    /\b(sarong|pareo|kaftan|caftan|cover-?up|flip-?flops?|slides?|espadrilles?|sun ?hat|straw|crochet)\b/,
+  ],
   ["rain", /\b(rain ?(coat|jacket|shell|wear|proof)?|waterproof|shell|trench|windbreaker|parka)\b/],
 ];
 
@@ -167,7 +198,15 @@ export interface ProductPage {
   color: string | null;
 }
 
-const ENTITIES: Record<string, string> = { amp: "&", quot: '"', apos: "'", "#39": "'", lt: "<", gt: ">", nbsp: " " };
+const ENTITIES: Record<string, string> = {
+  amp: "&",
+  quot: '"',
+  apos: "'",
+  "#39": "'",
+  lt: "<",
+  gt: ">",
+  nbsp: " ",
+};
 const decode = (s: string) =>
   s
     .replace(/&(amp|quot|apos|#39|lt|gt|nbsp);/g, (_, e: string) => ENTITIES[e] ?? "")
@@ -225,7 +264,11 @@ export function readProductPage(html: string, pageUrl: string): ProductPage | nu
   }
   const site = meta(html, "og:site_name");
   let name = text(product?.name) ?? meta(html, "og:title");
-  if (name && site) name = name.replace(new RegExp(`\\s*[|–-]\\s*${site.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*$`, "i"), "");
+  if (name && site)
+    name = name.replace(
+      new RegExp(`\\s*[|–-]\\s*${site.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*$`, "i"),
+      "",
+    );
   name = name?.split(" | ")[0]?.trim() || null;
   if (!name) return null;
   const rawImage = text(product?.image) ?? meta(html, "og:image");
@@ -285,6 +328,7 @@ export function isDressed(day: DayLooks | undefined): boolean {
 export const PLAN_CHOICES = [
   "Travel day",
   "Game drive",
+  "Skydiving",
   "Beach",
   "Pool",
   "Wine tasting",
@@ -320,11 +364,16 @@ export function lookNotes(
   if (slot === "day" && (p.has("beach") || p.has("pool") || p.has("boat trip")) && !has("swim"))
     notes.push("Beach plans: add swim");
   if (p.has("game drive")) {
-    if (slot === "day" && !has("layer")) notes.push("Game drives start at dawn in an open vehicle: add a layer");
+    if (slot === "day" && !has("layer"))
+      notes.push("Game drives start at dawn in an open vehicle: add a layer");
     const bright = pieces.find((x) => x.color && BRIGHT.has(x.color));
     if (bright) notes.push(`${bright.name} stands out on a game drive; neutrals blend in and hide the dust`);
   }
-  if (slot === "day" && p.has("hike") && !pieces.some((x) => x.category === "shoes" && x.tags.includes("active")))
+  if (
+    slot === "day" &&
+    p.has("hike") &&
+    !pieces.some((x) => x.category === "shoes" && x.tags.includes("active"))
+  )
     notes.push("Hike: add walking shoes");
   if (slot === "evening" && p.has("dinner out") && !pieces.some((x) => x.tags.includes("dressy")))
     notes.push("Dinner out: add something dressy");

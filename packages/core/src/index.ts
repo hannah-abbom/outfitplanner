@@ -26,3 +26,6 @@ export {
 } from "./weather";
 export * from "./closet";
 export { whatsLeft, type LeftItem, type TripProgress } from "./left";
+export * from "./trends";
+export * from "./stylist";
+export * from "./stylist-grade";

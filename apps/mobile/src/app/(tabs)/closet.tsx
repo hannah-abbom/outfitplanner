@@ -24,12 +24,16 @@ export default function ClosetScreen() {
         <Eyebrow>Closet</Eyebrow>
         <Title>Start with what you own</Title>
         <Body style={{ color: c.muted }}>
-          Add photos of your clothes, screenshots of things you’ve bought, or links to product pages. You’ll drag them
-          onto each day of the trip, and the closet carries over to the next one.
+          Add photos of your clothes, screenshots of things you’ve bought, or links to product pages. You’ll
+          drag them onto each day of the trip, and the closet carries over to the next one.
         </Body>
         <View style={{ gap: Space.sm, marginTop: Space.md }}>
           <Button label="Add clothes" onPress={() => router.push("/add")} />
-          <Button label="Try sample pieces" kind="secondary" onPress={() => sampleCloset().forEach(savePiece)} />
+          <Button
+            label="Try sample pieces"
+            kind="secondary"
+            onPress={() => sampleCloset().forEach(savePiece)}
+          />
         </View>
       </Screen>
     );
@@ -53,14 +57,28 @@ export default function ClosetScreen() {
           </Eyebrow>
           <Title>Closet</Title>
         </View>
-        <Pressable accessibilityRole="button" onPress={() => router.push("/add")} hitSlop={12} style={{ minHeight: 44, justifyContent: "center" }}>
-          <Eyebrow style={{ color: c.ink, borderBottomWidth: 1, borderBottomColor: c.ink, paddingBottom: 2 }}>Add</Eyebrow>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/add")}
+          hitSlop={12}
+          style={{ minHeight: 44, justifyContent: "center" }}
+        >
+          <Eyebrow style={{ color: c.ink, borderBottomWidth: 1, borderBottomColor: c.ink, paddingBottom: 2 }}>
+            Add
+          </Eyebrow>
         </Pressable>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -Space.xl }} contentContainerStyle={{ gap: 6, paddingHorizontal: Space.xl }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ marginHorizontal: -Space.xl }}
+        contentContainerStyle={{ gap: 6, paddingHorizontal: Space.xl }}
+      >
         <Chip label="All" on={filter === "all"} onPress={() => setFilter("all")} />
-        {toGet > 0 && <Chip label={`To get · ${toGet}`} on={filter === "to-get"} onPress={() => setFilter("to-get")} />}
+        {toGet > 0 && (
+          <Chip label={`To get · ${toGet}`} on={filter === "to-get"} onPress={() => setFilter("to-get")} />
+        )}
         {present.map((k) => (
           <Chip key={k} label={CATEGORY_LABEL[k]} on={filter === k} onPress={() => setFilter(k)} />
         ))}

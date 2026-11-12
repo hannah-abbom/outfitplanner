@@ -41,12 +41,26 @@ export function PieceThumb({
       ]}
     >
       {item.image ? (
-        <Image source={{ uri: item.image }} style={{ width: "100%", height: "100%" }} contentFit="cover" transition={150} />
+        <Image
+          source={{ uri: item.image }}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          transition={150}
+        />
       ) : (
         <Flat category={item.category} color={item.color} size={Math.round(Math.min(width, height) * 0.72)} />
       )}
       {showToGet && item.status === "to-get" && (
-        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: c.accent, paddingVertical: 2 }}>
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: c.accent,
+            paddingVertical: 2,
+          }}
+        >
           <Text
             style={{
               fontFamily: Fonts.medium,

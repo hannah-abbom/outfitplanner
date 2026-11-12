@@ -12,7 +12,15 @@ export function Close() {
       accessibilityRole="button"
       accessibilityLabel="Close"
       onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
-      style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: c.line, alignItems: "center", justifyContent: "center" }}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        borderWidth: 1,
+        borderColor: c.line,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
       <Icon name="close" color={c.ink} size={16} strokeWidth={1.6} />
     </Pressable>

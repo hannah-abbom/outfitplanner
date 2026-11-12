@@ -1,8 +1,10 @@
+import { BodoniModa_400Regular, BodoniModa_400Regular_Italic } from "@expo-google-fonts/bodoni-moda";
 import {
-  BodoniModa_400Regular,
-  BodoniModa_400Regular_Italic,
-} from "@expo-google-fonts/bodoni-moda";
-import { Geist_300Light, Geist_400Regular, Geist_500Medium, Geist_600SemiBold } from "@expo-google-fonts/geist";
+  Geist_300Light,
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+} from "@expo-google-fonts/geist";
 import { GeistMono_400Regular, GeistMono_500Medium } from "@expo-google-fonts/geist-mono";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";

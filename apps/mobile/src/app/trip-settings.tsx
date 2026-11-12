@@ -1,7 +1,16 @@
 import { CountryCode, IsoDate, type Traveler } from "@trip/core";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Close } from "@/components/close";
@@ -60,7 +69,9 @@ export default function TripSettingsScreen() {
         .filter(Boolean);
       if (!d.name.trim()) return setTravelerError("Give each traveler a name.");
       if (codes.length === 0 || !codes.every((x) => CountryCode.safeParse(x).success)) {
-        return setTravelerError(`Use two-letter country codes for ${d.name.trim()}'s passports, like PA or US.`);
+        return setTravelerError(
+          `Use two-letter country codes for ${d.name.trim()}'s passports, like PA or US.`,
+        );
       }
       const expiry = d.passportExpiry.trim();
       if (expiry && !IsoDate.safeParse(expiry).success)
@@ -70,7 +81,8 @@ export default function TripSettingsScreen() {
     if (out.length === 0) return setTravelerError("Add at least one traveler.");
     setTravelerError(null);
     setTravelers(out);
-    if (id && name.trim() && name.trim() !== trip?.name) updateTrip(id, (t) => ({ ...t, trip: { ...t.trip, name: name.trim() } }));
+    if (id && name.trim() && name.trim() !== trip?.name)
+      updateTrip(id, (t) => ({ ...t, trip: { ...t.trip, name: name.trim() } }));
     router.back();
   }
 
@@ -86,7 +98,10 @@ export default function TripSettingsScreen() {
   } as const;
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1, backgroundColor: c.paper }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: c.paper }}
+    >
       <ScrollView
         contentContainerStyle={{
           padding: Space.xl,
@@ -101,7 +116,9 @@ export default function TripSettingsScreen() {
           <Close />
         </View>
 
-        <Eyebrow style={{ marginTop: Space.sm }}>{trip ? "Import again or add another" : "Your agent’s itinerary"}</Eyebrow>
+        <Eyebrow style={{ marginTop: Space.sm }}>
+          {trip ? "Import again or add another" : "Your agent’s itinerary"}
+        </Eyebrow>
         <Rule strong />
         <TextInput
           value={link}
@@ -115,10 +132,14 @@ export default function TripSettingsScreen() {
           style={input}
         />
         {error && <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.accent }}>{error}</Text>}
-        {busy ? <ActivityIndicator color={c.accent} /> : <Button label="Import" onPress={runImport} disabled={!link.trim()} />}
+        {busy ? (
+          <ActivityIndicator color={c.accent} />
+        ) : (
+          <Button label="Import" onPress={runImport} disabled={!link.trim()} />
+        )}
         <Muted>
-          Flights are joined, every night gets its stay, and missing transfers are flagged. The same link again updates
-          the trip and keeps your outfits.
+          Flights are joined, every night gets its stay, and missing transfers are flagged. The same link
+          again updates the trip and keeps your outfits.
         </Muted>
 
         {!trip && (
@@ -137,11 +158,18 @@ export default function TripSettingsScreen() {
           <>
             <Eyebrow style={{ marginTop: Space.lg }}>Trip name</Eyebrow>
             <Rule strong />
-            <TextInput value={name} onChangeText={setName} accessibilityLabel="Trip name" style={[input, { fontFamily: Fonts.serif, fontSize: 20 }]} />
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              accessibilityLabel="Trip name"
+              style={[input, { fontFamily: Fonts.serif, fontSize: 20 }]}
+            />
 
             <Eyebrow style={{ marginTop: Space.lg }}>Who’s traveling</Eyebrow>
             <Rule strong />
-            <Body style={{ color: c.muted, fontSize: 14 }}>Entry rules depend on each passport. We never ask for passport numbers.</Body>
+            <Body style={{ color: c.muted, fontSize: 14 }}>
+              Entry rules depend on each passport. We never ask for passport numbers.
+            </Body>
             {drafts.map((d, i) => (
               <Card key={i} style={{ gap: Space.sm }}>
                 <TextInput
@@ -154,7 +182,9 @@ export default function TripSettingsScreen() {
                 />
                 <TextInput
                   value={d.nationalities}
-                  onChangeText={(v) => setDrafts(drafts.map((x, j) => (j === i ? { ...x, nationalities: v } : x)))}
+                  onChangeText={(v) =>
+                    setDrafts(drafts.map((x, j) => (j === i ? { ...x, nationalities: v } : x)))
+                  }
                   placeholder="Passport country codes, e.g. PA or US"
                   placeholderTextColor={c.faint}
                   autoCapitalize="characters"
@@ -163,7 +193,9 @@ export default function TripSettingsScreen() {
                 />
                 <TextInput
                   value={d.passportExpiry}
-                  onChangeText={(v) => setDrafts(drafts.map((x, j) => (j === i ? { ...x, passportExpiry: v } : x)))}
+                  onChangeText={(v) =>
+                    setDrafts(drafts.map((x, j) => (j === i ? { ...x, passportExpiry: v } : x)))
+                  }
                   placeholder="Passport expiry YYYY-MM-DD (optional)"
                   placeholderTextColor={c.faint}
                   accessibilityLabel={`Traveler ${i + 1} passport expiry`}
@@ -178,7 +210,9 @@ export default function TripSettingsScreen() {
             >
               <Eyebrow style={{ color: c.ink }}>+ Add another traveler</Eyebrow>
             </Pressable>
-            {travelerError && <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.accent }}>{travelerError}</Text>}
+            {travelerError && (
+              <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.accent }}>{travelerError}</Text>
+            )}
             <Button label="Save" onPress={save} />
 
             <Eyebrow style={{ marginTop: Space.lg }}>Temperatures</Eyebrow>

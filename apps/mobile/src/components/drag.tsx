@@ -197,7 +197,12 @@ export function DraggablePiece({
   return (
     <GestureDetector gesture={pan}>
       <View style={{ opacity: lifted ? 0.3 : 1 }}>
-        <PieceThumb item={item} width={width} selected={selected} onPress={() => !dragged.current && onPress()} />
+        <PieceThumb
+          item={item}
+          width={width}
+          selected={selected}
+          onPress={() => !dragged.current && onPress()}
+        />
       </View>
     </GestureDetector>
   );

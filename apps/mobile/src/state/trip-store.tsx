@@ -68,7 +68,8 @@ export function tripKey(trip: Trip): string {
   return `${trip.source.importedAt}|${trip.start}|${trip.end}`;
 }
 
-export const newId = (prefix: string) => `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+export const newId = (prefix: string) =>
+  `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 function freshTrip(trip: Trip): TripState {
   return { id: newId("t"), trip, done: {}, packed: {}, weather: null, looks: {}, plans: {} };
@@ -101,12 +102,20 @@ export function parseSaved(raw: string | null, old: string | null): Saved {
         const p = ClosetItem.safeParse(i);
         return p.success ? [p.data] : [];
       });
-      const activeId = trips.some((t) => t.id === j.activeId) ? (j.activeId as string) : (trips[0]?.id ?? null);
+      const activeId = trips.some((t) => t.id === j.activeId)
+        ? (j.activeId as string)
+        : (trips[0]?.id ?? null);
       return { trips, activeId, closet, unit: j.unit === "F" ? "F" : "C" };
     }
     if (old) {
       // The first build kept one trip under the old key.
-      const j = JSON.parse(old) as { trip?: unknown; done?: unknown; packed?: unknown; weather?: unknown; unit?: unknown };
+      const j = JSON.parse(old) as {
+        trip?: unknown;
+        done?: unknown;
+        packed?: unknown;
+        weather?: unknown;
+        unit?: unknown;
+      };
       const t = readTrip({ ...j, id: "t_first" });
       return { trips: t ? [t] : [], activeId: t?.id ?? null, closet: [], unit: j.unit === "F" ? "F" : "C" };
     }
@@ -142,7 +151,9 @@ export function TripProvider({ children }: { children: ReactNode }) {
       active: saved.trips.find((t) => t.id === saved.activeId) ?? null,
       addTrip: (trip) =>
         update((s) => {
-          const same = trip.source.url ? s.trips.find((t) => t.trip.source.url === trip.source.url) : undefined;
+          const same = trip.source.url
+            ? s.trips.find((t) => t.trip.source.url === trip.source.url)
+            : undefined;
           if (same) {
             const replaced = { ...same, trip: { ...trip, travelers: same.trip.travelers }, weather: null };
             return { ...s, trips: s.trips.map((t) => (t.id === same.id ? replaced : t)), activeId: same.id };
@@ -210,6 +221,9 @@ export function useTrip() {
     setWeather: (weather: SavedWeather) => up((t) => ({ ...t, weather })),
     addToLook: (date: IsoDate, slot: LookSlot, itemId: string) =>
       up((t) => ({ ...t, looks: addToLook(t.looks, date, slot, itemId) })),
+    /** Replaces a whole look, as when keeping a stylist suggestion for the whole trip. */
+    setLook: (date: IsoDate, slot: LookSlot, itemIds: string[]) =>
+      up((t) => ({ ...t, looks: { ...t.looks, [date]: { ...t.looks[date], [slot]: itemIds } } })),
     removeFromLook: (date: IsoDate, slot: LookSlot, itemId: string) =>
       up((t) => ({ ...t, looks: removeFromLook(t.looks, date, slot, itemId) })),
     togglePlan: (date: IsoDate, plan: string) =>

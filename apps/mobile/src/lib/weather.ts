@@ -54,7 +54,8 @@ export function useWeatherSync() {
     if (!active || running.current) return;
     const { id, trip, weather } = active;
     const key = tripKey(trip);
-    const fresh = weather && weather.tripKey === key && Date.now() - Date.parse(weather.fetchedAt) < REFRESH_MS;
+    const fresh =
+      weather && weather.tripKey === key && Date.now() - Date.parse(weather.fetchedAt) < REFRESH_MS;
     if (fresh || Date.now() - (lastTry.current[key] ?? 0) < RETRY_MS) return;
     running.current = true;
     lastTry.current[key] = Date.now();

@@ -53,12 +53,15 @@ export default function PieceScreen() {
       source: d.source ?? "manual",
       link: d.link ?? null,
       brand: d.brand ?? null,
+      note: d.note ?? null,
       status: "owned",
       addedAt: new Date().toISOString(),
     };
   });
   // Fields the person picked by hand stop following the name.
-  const [touched, setTouched] = useState<Set<string>>(() => new Set(existing ? ["category", "color", "warmth", "tags"] : []));
+  const [touched, setTouched] = useState<Set<string>>(
+    () => new Set(existing ? ["category", "color", "warmth", "tags"] : []),
+  );
   const set = <K extends keyof ClosetItem>(key: K, value: ClosetItem[K]) => {
     setTouched((t) => new Set(t).add(key));
     setItem((i) => ({ ...i, [key]: value }));
@@ -88,7 +91,10 @@ export default function PieceScreen() {
   const valid = item.name.trim().length > 0;
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1, backgroundColor: c.paper }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: c.paper }}
+    >
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -129,7 +135,12 @@ export default function PieceScreen() {
         <Eyebrow style={{ marginTop: Space.sm }}>What it is</Eyebrow>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
           {CATEGORIES.map((k: Category) => (
-            <Chip key={k} label={CATEGORY_LABEL[k]} on={item.category === k} onPress={() => set("category", k)} />
+            <Chip
+              key={k}
+              label={CATEGORY_LABEL[k]}
+              on={item.category === k}
+              onPress={() => set("category", k)}
+            />
           ))}
         </View>
 
@@ -194,6 +205,17 @@ export default function PieceScreen() {
           ]}
         />
 
+        <Eyebrow style={{ marginTop: Space.sm }}>Note</Eyebrow>
+        <TextInput
+          value={item.note ?? ""}
+          onChangeText={(v) => set("note", v.trim() ? v : null)}
+          placeholder="e.g. For Cape Town, or goes with the blue trikini"
+          placeholderTextColor={c.faint}
+          accessibilityLabel="Note"
+          style={input}
+        />
+        <Muted style={{ marginTop: -4 }}>The stylist reads this when it suggests looks.</Muted>
+
         <Eyebrow style={{ marginTop: Space.sm }}>Brand and link</Eyebrow>
         <TextInput
           value={item.brand ?? ""}
@@ -232,7 +254,15 @@ export default function PieceScreen() {
             }}
             style={{ alignSelf: "center", padding: Space.md, minHeight: 44 }}
           >
-            <Text style={{ fontFamily: Fonts.medium, fontSize: 12, letterSpacing: 1.6, textTransform: "uppercase", color: c.accent }}>
+            <Text
+              style={{
+                fontFamily: Fonts.medium,
+                fontSize: 12,
+                letterSpacing: 1.6,
+                textTransform: "uppercase",
+                color: c.accent,
+              }}
+            >
               Remove from closet
             </Text>
           </Pressable>

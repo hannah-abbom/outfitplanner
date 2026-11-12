@@ -132,7 +132,11 @@ describe("looks", () => {
   });
 
   it("packs each piece once with how often it's worn", () => {
-    const closet = [piece("a", "Ivory linen shirt"), piece("b", "Sand shorts"), piece("c", "Leather sandals")];
+    const closet = [
+      piece("a", "Ivory linen shirt"),
+      piece("b", "Sand shorts"),
+      piece("c", "Leather sandals"),
+    ];
     const looks: Looks = {
       "2027-03-12": { day: ["a", "b", "c"], evening: ["a"] },
       "2027-03-13": { day: ["b", "c", "gone"] },
@@ -169,5 +173,14 @@ describe("what's left", () => {
 
   it("is empty once the trip is over", () => {
     expect(whatsLeft({ trip, done: {}, looks: {} }, closet, "2027-04-01")).toEqual([]);
+  });
+});
+
+describe("more kinds of piece", () => {
+  it("reads sets, sundresses, trikinis and pareos", () => {
+    expect(guessFromName("Rent the Runway shorts and shirt set").category).toBe("set");
+    expect(guessFromName("Linen sundress").category).toBe("dress");
+    expect(guessFromName("Blue trikini").category).toBe("swim");
+    expect(guessFromName("Silk pareo")).toMatchObject({ category: "accessory", tags: ["dressy", "beach"] });
   });
 });

@@ -23,7 +23,12 @@ export function Bookings() {
   const items = useMemo<Item[]>(() => {
     if (!trip) return [];
     const all: Item[] = [
-      ...trip.flights.map((f) => ({ kind: "flight" as const, flight: f, date: dateOf(f.departs), order: f.departs.slice(11) })),
+      ...trip.flights.map((f) => ({
+        kind: "flight" as const,
+        flight: f,
+        date: dateOf(f.departs),
+        order: f.departs.slice(11),
+      })),
       ...trip.stays.map((s) => ({ kind: "stay" as const, stay: s, date: s.checkIn, order: "23:59" })),
       ...trip.gaps
         .filter((g) => g.kind === "no-transfer")
@@ -39,9 +44,21 @@ export function Bookings() {
   return (
     <View style={{ gap: Space.sm, marginTop: Space.sm }}>
       <View style={{ flexDirection: "row", gap: 6 }}>
-        <Chip label={`All ${trip.flights.length + trip.stays.length}`} on={filter === "all"} onPress={() => setFilter("all")} />
-        <Chip label={`Flights ${trip.flights.length}`} on={filter === "flights"} onPress={() => setFilter("flights")} />
-        <Chip label={`Stays ${trip.stays.length}`} on={filter === "stays"} onPress={() => setFilter("stays")} />
+        <Chip
+          label={`All ${trip.flights.length + trip.stays.length}`}
+          on={filter === "all"}
+          onPress={() => setFilter("all")}
+        />
+        <Chip
+          label={`Flights ${trip.flights.length}`}
+          on={filter === "flights"}
+          onPress={() => setFilter("flights")}
+        />
+        <Chip
+          label={`Stays ${trip.stays.length}`}
+          on={filter === "stays"}
+          onPress={() => setFilter("stays")}
+        />
       </View>
       {dates.map((date) => {
         const mine = items.filter((r) => r.date === date);
@@ -85,7 +102,9 @@ export function Bookings() {
                 <Row key={`gap-${g.date}-${g.airport}`} last={last}>
                   <Icon name="alert" color={c.accent} size={20} strokeWidth={1.4} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: Fonts.medium, fontSize: 15, color: c.accent }}>No transfer booked</Text>
+                    <Text style={{ fontFamily: Fonts.medium, fontSize: 15, color: c.accent }}>
+                      No transfer booked
+                    </Text>
                     <Muted>
                       {g.airport} airport to {g.stayName}. Ask the hotel or your agent.
                     </Muted>

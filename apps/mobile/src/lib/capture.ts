@@ -24,7 +24,8 @@ export const takeDraft = (): Draft | null => {
 };
 
 async function keep(a: ImagePicker.ImagePickerAsset): Promise<string> {
-  if (Platform.OS === "web") return a.base64 ? `data:${a.mimeType ?? "image/jpeg"};base64,${a.base64}` : a.uri;
+  if (Platform.OS === "web")
+    return a.base64 ? `data:${a.mimeType ?? "image/jpeg"};base64,${a.base64}` : a.uri;
   const dir = new Directory(Paths.document, "closet");
   if (!dir.exists) dir.create({ intermediates: true });
   const ext = (a.fileName?.split(".").pop() ?? "jpg").toLowerCase();
@@ -47,7 +48,9 @@ export async function pickImage(from: "library" | "camera"): Promise<Draft | nul
     base64: Platform.OS === "web",
   };
   const res =
-    from === "camera" ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
+    from === "camera"
+      ? await ImagePicker.launchCameraAsync(options)
+      : await ImagePicker.launchImageLibraryAsync(options);
   const asset = res.canceled ? undefined : res.assets[0];
   if (!asset) return null;
   const screenshot =
@@ -66,17 +69,20 @@ export async function readLink(raw: string): Promise<Draft & ProductPage> {
   } catch {
     throw new CaptureError("That doesn’t look like a link. Copy it from the shop’s Share button.");
   }
-  if (Platform.OS === "web") throw new CaptureError("Links work in the phone app. Here, add a screenshot instead.");
+  if (Platform.OS === "web")
+    throw new CaptureError("Links work in the phone app. Here, add a screenshot instead.");
   let html: string;
   try {
     const res = await fetch(url.toString(), { headers: { Accept: "text/html" } });
-    if (!res.ok) throw new CaptureError(`The shop answered ${res.status}. A screenshot of the product works too.`);
+    if (!res.ok)
+      throw new CaptureError(`The shop answered ${res.status}. A screenshot of the product works too.`);
     html = await res.text();
   } catch (e) {
     if (e instanceof CaptureError) throw e;
     throw new CaptureError("Couldn’t reach that shop. Check your connection, or add a screenshot.");
   }
   const page = readProductPage(html, url.toString());
-  if (!page) throw new CaptureError("That page didn’t say what the product is. A screenshot works for any shop.");
+  if (!page)
+    throw new CaptureError("That page didn’t say what the product is. A screenshot works for any shop.");
   return { ...page, link: url.toString(), source: "link" };
 }

@@ -10,11 +10,11 @@ packing list is whatever the looks use, plus the essentials and documents the ro
 
 Three questions, each with one home:
 
-| Question           | Home        | Holds                                                                   |
-| ------------------ | ----------- | ----------------------------------------------------------------------- |
+| Question           | Home        | Holds                                                                                            |
+| ------------------ | ----------- | ------------------------------------------------------------------------------------------------ |
 | What do I wear?    | **Outfits** | Every day with its weather and plans, a Day and an Evening look, and the suitcase they add up to |
-| What do I have?    | **Closet**  | Every piece, from photos, screenshots of things you bought, and links   |
-| Where, when, what? | **Trip**    | Days, bookings, and entry rules to _do_ before you go                   |
+| What do I have?    | **Closet**  | Every piece, from photos, screenshots of things you bought, and links                            |
+| Where, when, what? | **Trip**    | Days, bookings, and entry rules to _do_ before you go                                            |
 
 **Home** sits above them: every trip, the countdown to the next one, and one list of everything left across them.
 

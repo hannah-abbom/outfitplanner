@@ -10,36 +10,36 @@ keep the rest of the trip in hand.
 
 ## Closet (WRD)
 
-| ID     | Feature                                                                                    | Phase | Status  |
-| ------ | ------------------------------------------------------------------------------------------ | ----- | ------- |
-| WRD-01 | Add clothes from photos and screenshots of things you bought                               | 1     | done    |
-| WRD-02 | Add clothes from product links, reading the product page                                   | 1     | done    |
-| WRD-03 | Edit pieces: category, colour, warmth, style, have it or to get; first guess from the name | 1     | done    |
-| WRD-04 | Closet kept per person across trips                                                        | 1     | done    |
-| WRD-05 | AI reads photos and screenshots: several pieces per image, tagged, background removed      | 1     | planned |
-| WRD-06 | Bring in inspiration from Pinterest boards                                                 | 2     | planned |
+| ID     | Feature                                                                                            | Phase | Status  |
+| ------ | -------------------------------------------------------------------------------------------------- | ----- | ------- |
+| WRD-01 | Add clothes from photos and screenshots of things you bought                                       | 1     | done    |
+| WRD-02 | Add clothes from product links, reading the product page                                           | 1     | done    |
+| WRD-03 | Edit pieces: category, colour, warmth, style, have it or to get, a note; first guess from the name | 1     | done    |
+| WRD-04 | Closet kept per person across trips                                                                | 1     | done    |
+| WRD-05 | AI reads photos and screenshots: several pieces per image, tagged, background removed              | 1     | planned |
+| WRD-06 | Bring in inspiration from Pinterest boards                                                         | 2     | planned |
 
 ## Outfits (OUT)
 
-| ID     | Feature                                                                         | Phase | Status  |
-| ------ | ------------------------------------------------------------------------------- | ----- | ------- |
-| OUT-01 | Planner: every day with its weather, plans, and a Day and an Evening look       | 1     | done    |
-| OUT-02 | Drag pieces from the closet onto a look, or tap a piece and then a look         | 1     | done    |
-| OUT-03 | Plans per day (game drive, beach, dinner out) that shape the looks              | 1     | done    |
-| OUT-04 | Notes on what a look is missing for the weather and the plans                   | 1     | done    |
-| OUT-05 | AI suggests looks from your closet, the weather, the plans and current trends   | 1     | planned |
-| OUT-06 | Find pieces to buy from brands you name                                         | 2     | planned |
-| OUT-07 | Looks per traveler                                                              | 2     | planned |
-| OUT-08 | What repeats, what to leave home, and how well the capsule mixes                | 2     | planned |
+| ID     | Feature                                                                       | Phase | Status   |
+| ------ | ----------------------------------------------------------------------------- | ----- | -------- |
+| OUT-01 | Planner: every day with its weather, plans, and a Day and an Evening look     | 1     | done     |
+| OUT-02 | Drag pieces from the closet onto a look, or tap a piece and then a look       | 1     | done     |
+| OUT-03 | Plans per day (game drive, beach, dinner out) that shape the looks            | 1     | done     |
+| OUT-04 | Notes on what a look is missing for the weather and the plans                 | 1     | done     |
+| OUT-05 | AI suggests looks from your closet, the weather, the plans and current trends | 1     | building |
+| OUT-06 | Find pieces to buy from brands you name                                       | 2     | planned  |
+| OUT-07 | Looks per traveler                                                            | 2     | planned  |
+| OUT-08 | What repeats, what to leave home, and how well the capsule mixes              | 2     | planned  |
 
 ## Packing (PCK)
 
-| ID     | Feature                                                                  | Phase | Status  |
-| ------ | ------------------------------------------------------------------------ | ----- | ------- |
-| PCK-01 | One checklist: clothes, essentials, documents                            | 1     | done    |
-| PCK-02 | Clothes come from the looks, each piece once, with how often it's worn   | 1     | done    |
-| PCK-03 | Packed state shared between travelers                                    | 2     | planned |
-| PCK-04 | Luggage limits (carry-on only) shape the plan                            | 2     | planned |
+| ID     | Feature                                                                | Phase | Status  |
+| ------ | ---------------------------------------------------------------------- | ----- | ------- |
+| PCK-01 | One checklist: clothes, essentials, documents                          | 1     | done    |
+| PCK-02 | Clothes come from the looks, each piece once, with how often it's worn | 1     | done    |
+| PCK-03 | Packed state shared between travelers                                  | 2     | planned |
+| PCK-04 | Luggage limits (carry-on only) shape the plan                          | 2     | planned |
 
 ## Platform (PLT)
 

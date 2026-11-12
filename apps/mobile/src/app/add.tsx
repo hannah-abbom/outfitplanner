@@ -1,6 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Close } from "@/components/close";
@@ -36,7 +44,10 @@ export default function AddScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1, backgroundColor: c.paper }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: c.paper }}
+    >
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -53,9 +64,24 @@ export default function AddScreen() {
 
         <Eyebrow style={{ marginTop: Space.md }}>To your closet</Eyebrow>
         <Rule strong />
-        <Option icon="image" title="Photos & screenshots" detail="Your clothes, or screenshots of things you bought" onPress={() => go(() => pickImage("library"))} />
-        <Option icon="camera" title="Take a photo" detail="Lay the piece flat in good light" onPress={() => go(() => pickImage("camera"))} />
-        <Option icon="link" title="Paste a link" detail="From the shop’s product page" onPress={() => setShowLink(!showLink)} />
+        <Option
+          icon="image"
+          title="Photos & screenshots"
+          detail="Your clothes, or screenshots of things you bought"
+          onPress={() => go(() => pickImage("library"))}
+        />
+        <Option
+          icon="camera"
+          title="Take a photo"
+          detail="Lay the piece flat in good light"
+          onPress={() => go(() => pickImage("camera"))}
+        />
+        <Option
+          icon="link"
+          title="Paste a link"
+          detail="From the shop’s product page"
+          onPress={() => setShowLink(!showLink)}
+        />
         {showLink && (
           <View style={{ gap: Space.sm, paddingVertical: Space.sm }}>
             <TextInput
@@ -81,16 +107,34 @@ export default function AddScreen() {
             <Button label="Add from link" onPress={() => go(() => readLink(link))} disabled={!link.trim()} />
           </View>
         )}
-        <Option icon="hanger" title="Type it in" detail="Name it and pick a colour" onPress={() => go(async () => ({ source: "manual" }))} last />
+        <Option
+          icon="hanger"
+          title="Type it in"
+          detail="Name it and pick a colour"
+          onPress={() => go(async () => ({ source: "manual" }))}
+          last
+        />
 
         {busy && <ActivityIndicator color={c.accent} />}
         {error && <Text style={{ fontFamily: Fonts.body, fontSize: 13, color: c.accent }}>{error}</Text>}
 
         <Eyebrow style={{ marginTop: Space.xl }}>Trips</Eyebrow>
         <Rule strong />
-        <Option icon="map" title="Import an itinerary" detail="Paste your travel agent’s Travefy link" onPress={() => router.replace("/trip-settings")} last={!trip} />
+        <Option
+          icon="map"
+          title="Import an itinerary"
+          detail="Paste your travel agent’s Travefy link"
+          onPress={() => router.replace("/trip-settings")}
+          last={!trip}
+        />
         {trip && (
-          <Option icon="shield" title="Who’s traveling" detail={`Passports for ${trip.name}`} onPress={() => router.replace("/trip-settings")} last />
+          <Option
+            icon="shield"
+            title="Who’s traveling"
+            detail={`Passports for ${trip.name}`}
+            onPress={() => router.replace("/trip-settings")}
+            last
+          />
         )}
         <Muted style={{ marginTop: Space.md }}>Everything stays on this phone.</Muted>
       </ScrollView>

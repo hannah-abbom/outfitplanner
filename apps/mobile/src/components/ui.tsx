@@ -22,7 +22,10 @@ export function Title({ children, style, numberOfLines }: TextProps) {
     <Text
       numberOfLines={numberOfLines}
       accessibilityRole="header"
-      style={[{ fontFamily: Fonts.serif, fontSize: 40, lineHeight: 44, letterSpacing: -0.4, color: c.ink }, style]}
+      style={[
+        { fontFamily: Fonts.serif, fontSize: 40, lineHeight: 44, letterSpacing: -0.4, color: c.ink },
+        style,
+      ]}
     >
       {children}
     </Text>
@@ -35,7 +38,10 @@ export function Serif({ children, style, numberOfLines, size = 20 }: TextProps &
   return (
     <Text
       numberOfLines={numberOfLines}
-      style={[{ fontFamily: Fonts.serif, fontSize: size, lineHeight: Math.round(size * 1.22), color: c.ink }, style]}
+      style={[
+        { fontFamily: Fonts.serif, fontSize: size, lineHeight: Math.round(size * 1.22), color: c.ink },
+        style,
+      ]}
     >
       {children}
     </Text>
@@ -134,7 +140,12 @@ export function SectionHeader({
     >
       <Eyebrow>{title}</Eyebrow>
       {action && onAction && (
-        <Pressable accessibilityRole="button" onPress={onAction} hitSlop={12} style={{ minHeight: 32, justifyContent: "center" }}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onAction}
+          hitSlop={12}
+          style={{ minHeight: 32, justifyContent: "center" }}
+        >
           <Eyebrow style={{ color: c.ink }}>{action}</Eyebrow>
         </Pressable>
       )}
@@ -211,7 +222,14 @@ export function Card({
 /** A thin line between things. `strong` draws it in ink, to open a section. */
 export function Rule({ strong, style }: { strong?: boolean; style?: StyleProp<ViewStyle> }) {
   const c = usePalette();
-  return <View style={[{ height: strong ? 1 : StyleSheet.hairlineWidth * 2, backgroundColor: strong ? c.ink : c.line }, style]} />;
+  return (
+    <View
+      style={[
+        { height: strong ? 1 : StyleSheet.hairlineWidth * 2, backgroundColor: strong ? c.ink : c.line },
+        style,
+      ]}
+    />
+  );
 }
 
 /** A row in a list: content with a hairline under it, tappable when it goes somewhere. */
@@ -256,7 +274,13 @@ export type Tone = "ok" | "todo" | "check" | "soon" | "accent";
 /** A status in small capitals. Burgundy when it needs you. */
 export function Tag({ children, tone }: { children: ReactNode; tone: Tone }) {
   const c = usePalette();
-  const color: Record<Tone, string> = { ok: c.ink, todo: c.accent, check: c.muted, soon: c.accent, accent: c.accent };
+  const color: Record<Tone, string> = {
+    ok: c.ink,
+    todo: c.accent,
+    check: c.muted,
+    soon: c.accent,
+    accent: c.accent,
+  };
   return (
     <Text
       style={{
@@ -309,7 +333,15 @@ export function Button({
         style,
       ]}
     >
-      <Text style={{ fontFamily: Fonts.medium, fontSize: 12, letterSpacing: 2, textTransform: "uppercase", color: fg }}>
+      <Text
+        style={{
+          fontFamily: Fonts.medium,
+          fontSize: 12,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          color: fg,
+        }}
+      >
         {label}
       </Text>
     </Pressable>
@@ -330,7 +362,12 @@ export function Segmented<T extends string>({
   return (
     <View
       accessibilityRole="tablist"
-      style={{ flexDirection: "row", gap: Space.xl, borderBottomWidth: StyleSheet.hairlineWidth * 2, borderBottomColor: c.line }}
+      style={{
+        flexDirection: "row",
+        gap: Space.xl,
+        borderBottomWidth: StyleSheet.hairlineWidth * 2,
+        borderBottomColor: c.line,
+      }}
     >
       {options.map((o) => {
         const on = o.value === value;
@@ -340,7 +377,13 @@ export function Segmented<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
             onPress={() => onChange(o.value)}
-            style={{ minHeight: 44, justifyContent: "center", borderBottomWidth: 1.5, borderBottomColor: on ? c.accent : "transparent", marginBottom: -1 }}
+            style={{
+              minHeight: 44,
+              justifyContent: "center",
+              borderBottomWidth: 1.5,
+              borderBottomColor: on ? c.accent : "transparent",
+              marginBottom: -1,
+            }}
           >
             <Text
               style={{

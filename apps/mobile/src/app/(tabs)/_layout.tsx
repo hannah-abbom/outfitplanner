@@ -63,7 +63,13 @@ function TabButton({ label, isFocused, ...props }: Omit<TabTriggerSlotProps, "re
       accessibilityState={{ selected: !!isFocused }}
       style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 48 }}
     >
-      <View style={{ borderBottomWidth: 1.5, borderBottomColor: isFocused ? c.accent : "transparent", paddingBottom: 4 }}>
+      <View
+        style={{
+          borderBottomWidth: 1.5,
+          borderBottomColor: isFocused ? c.accent : "transparent",
+          paddingBottom: 4,
+        }}
+      >
         <Text
           style={{
             fontFamily: Fonts.medium,

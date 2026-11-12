@@ -19,7 +19,11 @@ export function Itinerary() {
       <Eyebrow style={{ marginTop: Space.sm }}>Chapters</Eyebrow>
       <Rule strong />
       {trip.stays.map((s, i) => (
-        <Row key={s.id} last={i === trip.stays.length - 1} onPress={() => router.push({ pathname: "/stay/[id]", params: { id: s.id } })}>
+        <Row
+          key={s.id}
+          last={i === trip.stays.length - 1}
+          onPress={() => router.push({ pathname: "/stay/[id]", params: { id: s.id } })}
+        >
           <Mono style={{ width: 28 }}>{roman(i + 1)}</Mono>
           <View style={{ flex: 1 }}>
             <Serif size={18} numberOfLines={1}>
@@ -36,7 +40,9 @@ export function Itinerary() {
         const chapter = chapterOf(gi);
         return (
           <View key={`${g.stay?.id ?? "travel"}-${g.days[0]?.date}`} style={{ marginTop: Space.lg }}>
-            <Eyebrow>{g.stay ? `Chapter ${roman(chapter)} · ${nights(g.stay.nights)}` : "On the way"}</Eyebrow>
+            <Eyebrow>
+              {g.stay ? `Chapter ${roman(chapter)} · ${nights(g.stay.nights)}` : "On the way"}
+            </Eyebrow>
             <Serif size={22} style={{ marginTop: 2, marginBottom: Space.sm }} numberOfLines={2}>
               {g.stay ? g.stay.name : "Travel days"}
             </Serif>
@@ -76,10 +82,16 @@ function DayRow({ day, last }: { day: TripDay; last: boolean }) {
   const block = dateBlock(day.date);
   const lines = day.items.filter((i) => i.kind !== "check-out" || day.items.length === 1).map(itemLine);
   return (
-    <Row last={last} onPress={() => router.push({ pathname: "/day/[date]", params: { date: day.date } })} style={{ alignItems: "flex-start" }}>
+    <Row
+      last={last}
+      onPress={() => router.push({ pathname: "/day/[date]", params: { date: day.date } })}
+      style={{ alignItems: "flex-start" }}
+    >
       <View style={{ width: 40 }}>
         <Eyebrow style={{ fontSize: 9.5 }}>{block.weekday}</Eyebrow>
-        <Text style={{ fontFamily: Fonts.serifUpright, fontSize: 26, lineHeight: 30, color: c.ink }}>{block.day}</Text>
+        <Text style={{ fontFamily: Fonts.serifUpright, fontSize: 26, lineHeight: 30, color: c.ink }}>
+          {block.day}
+        </Text>
       </View>
       <View style={{ flex: 1, gap: 3, paddingTop: 2 }}>
         {lines.length === 0 && <Muted>{day.sleep ? `At ${day.sleep.name}` : "Nothing booked"}</Muted>}
@@ -87,7 +99,9 @@ function DayRow({ day, last }: { day: TripDay; last: boolean }) {
           <View key={i} style={{ flexDirection: "row", gap: 8 }}>
             {l.time && <Mono style={{ paddingTop: 2 }}>{l.time}</Mono>}
             {l.warn ? (
-              <Text style={{ flex: 1, fontFamily: Fonts.medium, fontSize: 13, color: c.accent }}>{l.text}</Text>
+              <Text style={{ flex: 1, fontFamily: Fonts.medium, fontSize: 13, color: c.accent }}>
+                {l.text}
+              </Text>
             ) : (
               <Strong style={{ flex: 1, fontFamily: Fonts.body, fontSize: 14 }}>{l.text}</Strong>
             )}

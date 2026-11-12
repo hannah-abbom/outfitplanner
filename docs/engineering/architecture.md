@@ -119,9 +119,15 @@ system prompt, its Zod output schema and its post-processing in code.
 | `researchRequirements` | Traveler nationality, residence, country, dates; web search limited to official government sites | Requirement items, each with a source URL and quote        | high   |
 | `suggestEssentials`    | Trip kind, places, weather, plans, the rule-based list                                           | Extra items, each with a reason                            | medium |
 | `planOutfits`          | Days, weather, plans, wardrobe, luggage, the trends brief                                        | Outfits per day and traveler, missing pieces, extras, tips | high   |
-| `trendsBrief`          | Season, destinations, the person's style words; web search                                       | A short brief of current trends with sources               | medium |
-| `findPieces`           | A missing piece and the brands the person names; web search limited to those brands' domains     | Products with name, link, image and price as found         | medium |
-| `readBoard`            | Pins from a Pinterest board the person connected (Pinterest API, boards and pins read access)     | Style words and the pieces the pins show                   | low    |
+
+The first version of `planOutfits` runs without a server: in the app link on claude.ai the page asks Claude through
+the viewer's own account (the artifact `sample` capability), with the prompt and answer checks in
+`packages/core/src/stylist.ts` and the trends brief in `trends.ts`, refreshed by hand with its sources. The phone app
+needs the API service for it. `packages/evals` grades the prompt on a fictional trip through the Claude API and skips
+without a key.
+| `trendsBrief` | Season, destinations, the person's style words; web search | A short brief of current trends with sources | medium |
+| `findPieces` | A missing piece and the brands the person names; web search limited to those brands' domains | Products with name, link, image and price as found | medium |
+| `readBoard` | Pins from a Pinterest board the person connected (Pinterest API, boards and pins read access) | Style words and the pieces the pins show | low |
 
 ## Flows
 
