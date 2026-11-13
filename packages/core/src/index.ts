@@ -30,6 +30,7 @@ export * from "./trend-model";
 export * from "./trend-merge";
 export * from "./trend-match";
 export * from "./trend-grade";
+export * from "./trend-read";
 export { TRENDS } from "./trends";
 export * from "./stylist";
 export * from "./stylist-grade";

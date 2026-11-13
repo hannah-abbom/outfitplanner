@@ -1,0 +1,20 @@
+{
+  "name": "@trip/trends",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "weekly": "tsx src/weekly.ts",
+    "review": "tsx src/review.ts",
+    "evals": "tsx src/read.eval.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0",
+    "@trip/core": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
+}
