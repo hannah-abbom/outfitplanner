@@ -217,6 +217,12 @@ framed until a development build can use the system's subject lifting (Apple Vis
 
 ## Environments and secrets
 
+The web build deploys to Vercel from `apps/mobile/vercel.json`: in Vercel, import the repository with
+`apps/mobile` as the root directory and the rest is read from that file (Expo's single-page export, with every path
+served by `index.html`). A Vercel site is public, so it ships with no trip data, only the fictional sample trip, until
+accounts and a backend exist. The stylist there needs its own server route, because the claude.ai `sample` call only
+exists inside a claude.ai artifact.
+
 | Variable                               | Used by                |
 | -------------------------------------- | ---------------------- |
 | `DATABASE_URL`                         | db (PGlite when unset) |
