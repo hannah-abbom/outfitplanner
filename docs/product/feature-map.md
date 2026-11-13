@@ -22,16 +22,18 @@ keep the rest of the trip in hand.
 
 ## Outfits (OUT)
 
-| ID     | Feature                                                                       | Phase | Status   |
-| ------ | ----------------------------------------------------------------------------- | ----- | -------- |
-| OUT-01 | Planner: every day with its weather, plans, and a Day and an Evening look     | 1     | done     |
-| OUT-02 | Drag pieces from the closet onto a look, or tap a piece and then a look       | 1     | done     |
-| OUT-03 | Plans per day (game drive, beach, dinner out) that shape the looks            | 1     | done     |
-| OUT-04 | Notes on what a look is missing for the weather and the plans                 | 1     | done     |
-| OUT-05 | AI suggests looks from your closet, the weather, the plans and current trends | 1     | building |
-| OUT-06 | Find pieces to buy from brands you name                                       | 2     | planned  |
-| OUT-07 | Looks per traveler                                                            | 2     | planned  |
-| OUT-08 | What repeats, what to leave home, and how well the capsule mixes              | 2     | planned  |
+| ID     | Feature                                                                        | Phase | Status   |
+| ------ | ------------------------------------------------------------------------------ | ----- | -------- |
+| OUT-01 | Planner: every day with its weather, plans, and a Day and an Evening look      | 1     | done     |
+| OUT-02 | Drag pieces from the closet onto a look, or tap a piece and then a look        | 1     | done     |
+| OUT-03 | Plans per day (game drive, beach, dinner out) that shape the looks             | 1     | done     |
+| OUT-04 | Notes on what a look is missing for the weather and the plans                  | 1     | done     |
+| OUT-05 | AI suggests looks from your closet, the weather, the plans and current trends  | 1     | building |
+| OUT-06 | Find pieces to buy from brands you name                                        | 2     | planned  |
+| OUT-07 | Looks per traveler                                                             | 2     | planned  |
+| OUT-08 | What repeats, what to leave home, and how well the capsule mixes               | 2     | planned  |
+| OUT-09 | Trends kept current: a weekly brief from tracked sources, approved by a person | 1     | building |
+| OUT-10 | Your on-trend pieces for a trip, and the one piece that would complete a trend | 2     | building |
 
 ## Packing (PCK)
 

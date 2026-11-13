@@ -38,7 +38,9 @@ packages/
   ingest/       Email (MIME, HTML to text), PDF text, image prep, safe fetch of product pages
   integrations/ Flight status, weather, inbound email, reference data loaders; each behind an interface with a fake
   ui/           Design tokens and primitives
-data/           Reference data with its source and licence: airports, countries, plug types
+  trends/       The weekly trends job, its review command and its eval (moves into ai/ with the gateway)
+data/           Reference data with its source and licence: airports, countries, plug types; trends/ holds the
+                tracked trends and brief versions the weekly job writes
 prototype/      The single-page outfit planner that came first
 docs/           product/ engineering/ decisions/
 ```
@@ -125,7 +127,13 @@ the viewer's own account (the artifact `sample` capability), with the prompt and
 `packages/core/src/stylist.ts` and the trends brief in `trends.ts`, refreshed by hand with its sources. The phone app
 needs the API service for it. `packages/evals` grades the prompt on a fictional trip through the Claude API and skips
 without a key.
-| `trendsBrief` | Season, destinations, the person's style words; web search | A short brief of current trends with sources | medium |
+
+The trends brief is moving from hand research to a weekly job: Claude searches a fixed list of sites, code merges
+what it finds into tracked trends with momentum, and a person approves each brief before the stylist reads it. The
+same trends are matched against a closet in code. The model, the pipeline, sources and their terms, costs and open
+decisions are in [trends.md](trends.md); the job and its eval are in `packages/trends`.
+
+| `trendsBrief` | A fixed list of fashion sites through web search, the trends already tracked | Trend mentions with sources, merged in code into a brief a person approves ([trends.md](trends.md)) | medium |
 | `findPieces` | A missing piece and the brands the person names; web search limited to those brands' domains | Products with name, link, image and price as found | medium |
 | `readBoard` | Pins from a Pinterest board the person connected (Pinterest API, boards and pins read access) | Style words and the pieces the pins show | low |
 
